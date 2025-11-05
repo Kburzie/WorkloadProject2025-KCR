@@ -30,6 +30,15 @@ builder.Services.AddScoped<IProgramsOfStudyService, ProgramsOfStudyService>();
 builder.Services.AddScoped<ITermService, TermService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 
+builder.Services.AddScoped<SchoolService>();
+builder.Services.AddScoped<WorkloadCategoriesService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<FacultyService>();
+builder.Services.AddScoped<FacultyWorkloadService>();
+builder.Services.AddScoped<ProgramsOfStudyService>();
+builder.Services.AddScoped<TermService>();
+builder.Services.AddScoped<DepartmentService>();
+
 
 builder.Services.AddAuthentication(options =>
     {
