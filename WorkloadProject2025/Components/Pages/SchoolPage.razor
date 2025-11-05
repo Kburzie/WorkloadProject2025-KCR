@@ -2,6 +2,7 @@
 @using WorkloadProject2025.Data.Models
 @using WorkloadProject2025.Services
 @inject SchoolService _schoolService;
+@inject IDialogService DialogService
 
 <SchoolForm OnSaved="Save"></SchoolForm>
 
@@ -24,7 +25,7 @@
                     <MudButton Variant="Variant.Filled" 
                                Color="Color.Error" 
                                Size="Size.Small"
-                               OnClick="@(async () => await DeleteSchool(context.Id))">
+                               OnClick="@(async () => await DeleteSchool(context.Id, context.Name))">
                         Delete
                     </MudButton>
                 </MudTd>
@@ -52,11 +53,26 @@
         StateHasChanged();
     }
 
-    private async Task DeleteSchool(int id)
+    private async Task DeleteSchool(int id, string name)
     {
-        await _schoolService.DeleteAsync(id);
-        schools = await _schoolService.GetAllAsync();
-        StateHasChanged();
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the school '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _schoolService.DeleteAsync(id);
+                schools = await _schoolService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete school: {ex.Message}");
+            }
+        }
     }
 
 

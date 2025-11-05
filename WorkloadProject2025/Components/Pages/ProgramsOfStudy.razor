@@ -3,6 +3,7 @@
 @using WorkloadProject2025.Services
 @inject ProgramsOfStudyService _ProgramOfStudyService;
 @inject DepartmentService _departmentService;
+@inject IDialogService DialogService
 <ProgramOfStudyForm department="DEPT" OnSaved="Save"></ProgramOfStudyForm>
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
@@ -26,7 +27,7 @@
                     <MudButton Variant="Variant.Filled" 
                                Color="Color.Error" 
                                Size="Size.Small"
-                               OnClick="@(async () => await DeleteProgram(context.Id))">
+                               OnClick="@(async () => await DeleteProgram(context.Id, context.Name))">
                         Delete
                     </MudButton>
                 </MudTd>
@@ -55,10 +56,25 @@
         StateHasChanged();
     }
 
-    private async Task DeleteProgram(int id)
+    private async Task DeleteProgram(int id, string name)
     {
-        await _ProgramOfStudyService.DeleteAsync(id);
-        POS = await _ProgramOfStudyService.GetAllAsync();
-        StateHasChanged();
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the program '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _ProgramOfStudyService.DeleteAsync(id);
+                POS = await _ProgramOfStudyService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete program: {ex.Message}");
+            }
+        }
     }
 }

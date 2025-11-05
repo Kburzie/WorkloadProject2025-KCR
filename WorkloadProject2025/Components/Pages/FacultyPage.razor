@@ -2,6 +2,7 @@
 @using WorkloadProject2025.Data.Models
 @using WorkloadProject2025.Services
 @inject FacultyService _facultyService
+@inject IDialogService DialogService
 
 <FacultyForm OnSaved="Save"></FacultyForm>
 
@@ -28,7 +29,7 @@
                     <MudButton Variant="Variant.Filled" 
                                Color="Color.Error" 
                                Size="Size.Small"
-                               OnClick="@(async () => await DeleteFaculty(context.Email))">
+                               OnClick="@(async () => await DeleteFaculty(context.Email, $"{context.FirstName} {context.LastName}"))">
                         Delete
                     </MudButton>
                 </MudTd>
@@ -51,10 +52,25 @@
         StateHasChanged();
     }
 
-    private async Task DeleteFaculty(string email)
+    private async Task DeleteFaculty(string email, string name)
     {
-        await _facultyService.DeleteAsync(email);
-        faculty = await _facultyService.GetAllAsync();
-        StateHasChanged();
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the faculty member '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _facultyService.DeleteAsync(email);
+                faculty = await _facultyService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete faculty: {ex.Message}");
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@
 @using WorkloadProject2025.Services
 @inject DepartmentService _departmentService;
 @inject SchoolService schoolService;
+@inject IDialogService DialogService
 
 <DepartentForm Schools="schools" OnSaved="Save"></DepartentForm>
 
@@ -27,7 +28,7 @@
                     <MudButton Variant="Variant.Filled" 
                                Color="Color.Error" 
                                Size="Size.Small"
-                               OnClick="@(async () => await DeleteDepartment(context.Id))">
+                               OnClick="@(async () => await DeleteDepartment(context.Id, context.Name))">
                         Delete
                     </MudButton>
                 </MudTd>
@@ -54,11 +55,26 @@
         StateHasChanged();
     }
 
-    private async Task DeleteDepartment(int id)
+    private async Task DeleteDepartment(int id, string name)
     {
-        await _departmentService.DeleteAsync(id);
-        departments = await _departmentService.GetAllAsync();
-        StateHasChanged();
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the department '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _departmentService.DeleteAsync(id);
+                departments = await _departmentService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete department: {ex.Message}");
+            }
+        }
     }
 
 
