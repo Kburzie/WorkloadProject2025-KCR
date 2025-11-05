@@ -19,7 +19,7 @@ namespace WorkloadProject2025.Services
             if (intake == null)
                 throw new ArgumentNullException(nameof(intake));
 
-            if (string.IsNullOrWhiteSpace(intake.IntakeName))
+            if (string.IsNullOrWhiteSpace(intake.Name))
                 throw new ArgumentException("Intake must have a name", nameof(intake));
 
             if (intake.EndDate <= intake.StartDate)
