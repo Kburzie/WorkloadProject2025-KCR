@@ -28,7 +28,7 @@ builder.Services.AddScoped<FacultyService>();
 builder.Services.AddScoped<ProgramsOfStudyService>();
 builder.Services.AddScoped<TermService>();
 builder.Services.AddScoped<DepartmentService>();
-
+builder.Services.AddScoped<WorkloadService>();
 
 builder.Services.AddAuthentication(options =>
     {
