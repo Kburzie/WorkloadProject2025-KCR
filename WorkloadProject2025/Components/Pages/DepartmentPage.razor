@@ -1,6 +1,8 @@
-﻿@inject DepartmentService _departmentService;
+﻿@page "/departmentpage"
+@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
+@inject DepartmentService _departmentService;
 @inject SchoolService schoolService;
-@page "/departmentpage"
 
 <DepartentForm Schools="schools" OnSaved="Save"></DepartentForm>
 
