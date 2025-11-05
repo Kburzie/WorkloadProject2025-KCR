@@ -1,63 +1,63 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WorkloadProject2025.Data;
 using WorkloadProject2025.Data.Models;
 using WorkloadProject2025.Services.Interfaces;
 
-namespace WorkloadProject2025.Services
+namespace WorkloadProject2025.Services;
+
+public class ProgramsOfStudyService : IProgramsOfStudyService
 {
-    public class ProgramsOfStudyService : IProgramsOfStudyService
+    ApplicationDbContext _context;
+
+    public ProgramsOfStudyService(ApplicationDbContext db)
     {
-        // these lines give access to an instance of the database context
-        // injected through dependency injection
-        ApplicationDbContext _context;
-        public ProgramsOfStudyService(ApplicationDbContext db)
+        _context = db;
+    }
+
+    public async Task<ProgramOfStudy> AddAsync(ProgramOfStudy program, CancellationToken cancellationToken = default)
+    {
+        if (program == null)
+            throw new ArgumentNullException();
+
+        if (program.Name.Trim() == "")
         {
-            _context = db;
+            throw new Exception("Program must have a name");
         }
 
-        public async Task<ProgramOfStudy> AddAsync(ProgramOfStudy program, CancellationToken cancellationToken = default)
-        {
-            if (program == null)
-                throw new ArgumentNullException();
-            if (program.Name.Trim() == "")
-            {
-                throw new Exception("Program must have a name");
-            }
+        // to add records into a database with EF we just pass in our object and save changes
+        _context.ProgramsOfStudy.Add(program);
+        // commit to the db
+        await _context.SaveChangesAsync();
+        // return the record
+        return program;
+    }
 
-            // to add records into a database with EF we just pass in our object and save changes
-            _context.ProgramsOfStudy.Add(program);
-            // commit to the db
+    public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        // Empty list should be okay
+        return _context.ProgramsOfStudy.Include(p => p.Department).ToListAsync(cancellationToken);
+    }
+
+    public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        //LINQ is a language that lets you write queries in C#
+        return _context.ProgramsOfStudy.FirstOrDefaultAsync(program => program.Id == id);
+    }
+
+    public async Task<bool> DeleteAsync(ProgramOfStudy programOfStudy, CancellationToken cancellationToken = default)
+    {
+        bool result = false;
+        try
+        {
+            _context.ProgramsOfStudy.Remove(programOfStudy);
             await _context.SaveChangesAsync();
-            // return the record
-            return program;
+            result = true;
         }
-
-        public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
+        catch
         {
-            // Empty list should be okay
-            return _context.ProgramsOfStudy.Include(p => p.Department).ToListAsync(cancellationToken);
+            return result;
         }
 
-        public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        {
-            //LINQ is a language that lets you write queries in C#
-            return _context.ProgramsOfStudy.FirstOrDefaultAsync(program => program.Id == id);
-        }
-
-        public async Task<bool> DeleteAsync(ProgramOfStudy program, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                _context.ProgramsOfStudy.Remove(program);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
+        return result;
     }
 }
