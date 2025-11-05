@@ -3,33 +3,39 @@
 @using WorkloadProject2025.Services
 @inject CourseService courseService
 @inject ProgramsOfStudyService programsOfStudyService
+@inject IDialogService DialogService
 
 <CoursesForm OnCourseSaved="Save" programOfStudy="programsOfStudy"></CoursesForm>
 
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
+<MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Current Courses</MudText>
+        <MudText Typo="Typo.h5" Class="font-semibold">Current Courses</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Course</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
-        <MudStack Spacing="2">
-            @foreach (var course in courses)
-            {
-                <MudCard>
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.h6">@course.Name</MudText>
-                        </CardHeaderContent>
-                        <CardHeaderActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                        </CardHeaderActions>
-                    </MudCardHeader>
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Details</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            }
-        </MudStack>
+        <MudTable Items="@courses" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>Course</MudTh>
+                <MudTh>Program</MudTh>
+                <MudTh>Hours</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Course">@context.Name</MudTd>
+                <MudTd DataLabel="Program">@context.ProgramOfStudy?.Name</MudTd>
+                <MudTd DataLabel="Hours">@context.Hours</MudTd>
+                <MudTd DataLabel="">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Error" 
+                               Size="Size.Small"
+                               OnClick="@(async () => await DeleteCourse(context.Id, context.Name))">
+                        Delete
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     </MudCardContent>
 </MudCard>
 
@@ -47,5 +53,27 @@
     {
         courses = await courseService.GetAllAsync();
         StateHasChanged();
+    }
+
+    private async Task DeleteCourse(int id, string name)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the course '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await courseService.DeleteAsync(id);
+                courses = await courseService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete course: {ex.Message}");
+            }
+        }
     }
 }

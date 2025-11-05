@@ -1,35 +1,39 @@
 ﻿@page "/programsofstudy"
+@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
 @inject ProgramsOfStudyService _ProgramOfStudyService;
 @inject DepartmentService _departmentService;
+@inject IDialogService DialogService
 <ProgramOfStudyForm department="DEPT" OnSaved="Save"></ProgramOfStudyForm>
 
-
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
+<MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Current Programs</MudText>
+        <MudText Typo="Typo.h5" Class="font-semibold">Current Programs</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Program</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
-        <MudStack Spacing="2">
-            @foreach (var pos in POS)
-            {
-                <MudCard>
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.h6">@pos.Name</MudText>
-                        </CardHeaderContent>
-                        <CardHeaderActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                        </CardHeaderActions>
-                    </MudCardHeader>
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Courses</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            }
-        </MudStack>
+        <MudTable Items="@POS" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>Program</MudTh>
+                <MudTh>Department</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Program">@context.Name</MudTd>
+                <MudTd DataLabel="Department">@context.Department?.Name</MudTd>
+                <MudTd DataLabel="">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Error" 
+                               Size="Size.Small"
+                               OnClick="@(async () => await DeleteProgram(context.Id, context.Name))">
+                        Delete
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     </MudCardContent>
-
 </MudCard>
 
 @code {
@@ -50,5 +54,27 @@
         //Refresh our list of schools
         POS = await _ProgramOfStudyService.GetAllAsync();
         StateHasChanged();
+    }
+
+    private async Task DeleteProgram(int id, string name)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the program '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _ProgramOfStudyService.DeleteAsync(id);
+                POS = await _ProgramOfStudyService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete program: {ex.Message}");
+            }
+        }
     }
 }

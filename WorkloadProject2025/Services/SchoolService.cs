@@ -40,5 +40,15 @@ namespace WorkloadProject2025.Services
             //LINQ is a language that lets you write queries in C#
             return _context.Schools.FirstOrDefaultAsync(school => school.Id == id);
         }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var school = await GetByIdAsync(id, cancellationToken);
+            if (school != null)
+            {
+                _context.Schools.Remove(school);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+        }
     }
 }

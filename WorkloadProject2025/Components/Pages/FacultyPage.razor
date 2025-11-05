@@ -1,9 +1,76 @@
 ﻿@page "/facultypage"
-<br />
-<h1 style="text-align:center">Faculty Page</h1>
+@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
+@inject FacultyService _facultyService
+@inject IDialogService DialogService
 
-<FacultyForm></FacultyForm>
+<FacultyForm OnSaved="Save"></FacultyForm>
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
+    <MudCardHeader>
+        <MudText Typo="Typo.h5" Class="font-semibold">Current Faculty</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Faculty</MudButton>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudTable Items="@faculty" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Phone</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.FirstName @context.LastName</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Phone">@context.PhoneNumber</MudTd>
+                <MudTd DataLabel="">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Error" 
+                               Size="Size.Small"
+                               OnClick="@(async () => await DeleteFaculty(context.Email, $"{context.FirstName} {context.LastName}"))">
+                        Delete
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
 
 @code {
+    List<Faculty> faculty = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        faculty = await _facultyService.GetAllAsync();
+    }
+
+    public async Task Save()
+    {
+        faculty = await _facultyService.GetAllAsync();
+        StateHasChanged();
+    }
+
+    private async Task DeleteFaculty(string email, string name)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Confirm Delete",
+            $"Are you sure you want to delete the faculty member '{name}'? This action cannot be undone.",
+            yesText: "Delete", cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                await _facultyService.DeleteAsync(email);
+                faculty = await _facultyService.GetAllAsync();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("Error", $"Failed to delete faculty: {ex.Message}");
+            }
+        }
+    }
 }

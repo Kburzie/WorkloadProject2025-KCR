@@ -78,6 +78,9 @@
 
 
 @code {
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
     private Faculty faculty { get; set; } = new Faculty();
     private List<WorkloadCategory> workloadCategories = new List<WorkloadCategory>();
 
@@ -96,6 +99,7 @@
         await facultyService.AddAsync(faculty);
         Console.WriteLine($"Saving Faculty: {faculty.Email}");
         Cancel();
+        await OnSaved.InvokeAsync();
     }
 
 }

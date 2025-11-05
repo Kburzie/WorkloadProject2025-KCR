@@ -34,8 +34,8 @@ namespace WorkloadProject2025.Services
 
         public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            // Empty list should be okay
-            return _context.ProgramsOfStudy.ToListAsync();
+            // Include department for display
+            return _context.ProgramsOfStudy.Include(p => p.Department).ToListAsync();
         }
 
         public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -52,6 +52,16 @@ namespace WorkloadProject2025.Services
                     .ThenInclude(d => d.School)
                 .Include(p => p.Courses)
                 .ToListAsync(cancellationToken);
+        }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var program = await GetByIdAsync(id, cancellationToken);
+            if (program != null)
+            {
+                _context.ProgramsOfStudy.Remove(program);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }
