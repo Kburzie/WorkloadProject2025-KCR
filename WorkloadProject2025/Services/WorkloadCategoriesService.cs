@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WorkloadProject2025.Data;
 using WorkloadProject2025.Data.Models;
+using WorkloadProject2025.Services.Interfaces;
 
 namespace WorkloadProject2025.Services
 {
@@ -15,13 +16,14 @@ namespace WorkloadProject2025.Services
         {
             if (workloadcategory == null)
                 throw new ArgumentNullException();
+
             if (workloadcategory.MinimumHours == 0)
             {
-                throw new Exception("Minimum Hours Must have an Amount");
+                throw new Exception("Workload must have a minimum amount of hours");
             }
             if (workloadcategory.MaximumHours < workloadcategory.MinimumHours) 
             {
-                throw new Exception("Maximum Hours Must have an Amount higher than Minimum Hours");
+                throw new Exception("Workload maximum hours must be higher than minimum hours");
             }
             if (workloadcategory.EndDate <= workloadcategory.StartDate) 
             {
@@ -29,6 +31,7 @@ namespace WorkloadProject2025.Services
             }
             _context.WorkloadCategories.Add(workloadcategory);
             await _context.SaveChangesAsync();
+
             return workloadcategory;
         }
 

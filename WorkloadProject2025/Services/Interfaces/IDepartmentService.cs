@@ -1,6 +1,6 @@
 ﻿using WorkloadProject2025.Data.Models;
 
-namespace WorkloadProject2025.Services
+namespace WorkloadProject2025.Services.Interfaces
 {
     public interface IDepartmentService
     {

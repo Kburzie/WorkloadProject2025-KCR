@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkloadProject2025.Data;
 using WorkloadProject2025.Data.Models;
+using WorkloadProject2025.Services.Interfaces;
 
 namespace WorkloadProject2025.Services
 {
