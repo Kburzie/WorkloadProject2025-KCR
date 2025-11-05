@@ -1,5 +1,75 @@
-﻿@page "/WorkloadsPage"
+﻿@page "/workloadspage"
+@using WorkloadProject2025.Data.Models
+@inject WorkloadService _workloadService
+@inject IDialogService DialogService
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 1200px;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6" Class="font-semibold">Faculty Workloads</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddWorkloadDialog">Add New Workload</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudDataGrid Items="@workloads" Dense="true" Hover="true" Bordered="true">
+            <Columns>
+                <PropertyColumn Property="x => x.Faculty.LastName" Title="Faculty" />
+                <PropertyColumn Property="x => x.WorkloadCategory.Name" Title="Category" />
+                <PropertyColumn Property="x => x.Term.Name" Title="Term" />
+                <PropertyColumn Property="x => x.ProgramOfStudy.Name" Title="Program" />
+                <PropertyColumn Property="x => x.Course.Name" Title="Course" />
+                <PropertyColumn Property="x => x.Hours" Title="Hours" />
+                <PropertyColumn Property="x => x.DateAssigned" Title="Date Assigned" Format="MM/dd/yyyy"/>
+                
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" 
+                                     Variant="@Variant.Filled" 
+                                     Color="@Color.Secondary"
+                                     OnClick="() => DeleteRecord(context.Item)">
+                                Delete
+                            </MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudCardContent>
+</MudCard>
 
 @code {
+    private List<Workload> workloads = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadData();
+    }
+
+    private async Task OpenAddWorkloadDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium };
+        var dialog = await DialogService.ShowAsync<WorkloadsForm>("Add New Workload", options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await ReloadData();
+        }
+    }
+
+    private async Task DeleteRecord(Workload workload)
+    {
+        await _workloadService.DeleteAsync(workload);
+        await ReloadData();
+    }
+
+    private async Task ReloadData()
+    {
+        workloads = await _workloadService.GetAllAsync();
+        StateHasChanged();
+    }
 }

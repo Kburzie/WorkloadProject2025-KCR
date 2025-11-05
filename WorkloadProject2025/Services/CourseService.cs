@@ -35,5 +35,11 @@ namespace WorkloadProject2025.Services
         {
             return _context.Courses.FirstOrDefaultAsync(course => course.Id == id, cancellationToken);
         }
+        public Task<List<Course>> GetCoursesByProgramAsync(int programId, CancellationToken cancellationToken = default)
+        {
+            return _context.Courses
+                .Where(c => c.ProgramOfStudyId == programId)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

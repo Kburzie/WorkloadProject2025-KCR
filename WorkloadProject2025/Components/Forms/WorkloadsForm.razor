@@ -1,5 +1,134 @@
-﻿
+﻿@using WorkloadProject2025.Data.Models
+@using System.ComponentModel.DataAnnotations
+@inject WorkloadService workloadService
+@inject FacultyService facultyService
+@inject WorkloadCategoriesService categoryService
+@inject TermService termService
+@inject ProgramsOfStudyService programService
+@inject CourseService courseService
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="workload" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudStack Spacing="2">
+                <MudSelect T="string" 
+                          @bind-Value="workload.FacultyEmail"
+                          Label="Faculty"
+                          Required="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Person">
+                    @foreach(var faculty in facultyList)
+                    {
+                        <MudSelectItem Value="@faculty.Email">@($"{faculty.LastName}, {faculty.FirstName}")</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSelect T="int" 
+                          @bind-Value="workload.WorkloadCategoryId"
+                          Label="Workload Category"
+                          Required="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Category">
+                    @foreach(var category in categories)
+                    {
+                        <MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSelect T="int" 
+                          @bind-Value="workload.TermId"
+                          Label="Term"
+                          Required="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Today">
+                    @foreach(var term in terms)
+                    {
+                        <MudSelectItem Value="@term.Id">@term.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSelect T="int" 
+                          @bind-Value="workload.ProgramOfStudyId"
+                          Label="Program"
+                          Required="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.School"
+                          OnValueChanged="ProgramChanged">
+                    @foreach(var program in programs)
+                    {
+                        <MudSelectItem Value="@program.Id">@program.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSelect T="int?" 
+                          @bind-Value="workload.CourseId"
+                          Label="Course (Optional)"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Book">
+                    @foreach(var course in courses)
+                    {
+                        <MudSelectItem Value="@course.Id">@course.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudNumericField @bind-Value="workload.Hours"
+                                Label="Hours"
+                                Required="true"
+                                Min="0"
+                                Max="40"
+                                Adornment="Adornment.Start"
+                                AdornmentIcon="@Icons.Material.Filled.Timer" />
+
+                <MudTextField @bind-Value="workload.Description"
+                            Label="Description"
+                            Lines="3"
+                            Adornment="Adornment.Start"
+                            AdornmentIcon="@Icons.Material.Filled.Description" />
+            </MudStack>
+
+            <MudCardActions Class="d-flex justify-end mt-4">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+            </MudCardActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
 
+    private Workload workload = new() { DateAssigned = DateTime.Now, IsActive = true };
+    private List<Faculty> facultyList = new();
+    private List<WorkloadCategory> categories = new();
+    private List<Term> terms = new();
+    private List<ProgramOfStudy> programs = new();
+    private List<Course> courses = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        facultyList = await facultyService.GetAllAsync();
+        categories = await categoryService.GetAllAsync();
+        terms = await termService.GetAllAsync();
+        programs = await programService.GetAllAsync();
+    }
+
+    private async Task ProgramChanged(int programId)
+    {
+        // Load courses for selected program
+        courses = await courseService.GetCoursesByProgramAsync(programId);
+        StateHasChanged();
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        await workloadService.AddAsync(workload);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
 }
