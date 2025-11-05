@@ -1,52 +1,6 @@
 ﻿@page "/termpage"
-@inject TermService _termService
 
-<TermForm OnTermSaved="RefreshTerms"></TermForm>
-
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6" Class="font-semibold">Current Terms</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-
-    <MudCardContent>
-        <MudStack Spacing="2">
-            @if (terms.Any())
-            {
-                @foreach (var term in terms)
-                {
-                    <MudCard>
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@term.IntakeName</MudText>
-                                <MudText Typo="Typo.body2">
-                                    @(term.StartDate?.ToString("MM/dd/yyyy") ?? "N/A") - @(term.EndDate?.ToString("MM/dd/yyyy") ?? "N/A")
-                                </MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                    </MudCard>
-                }
-            }
-            else
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">No terms available.</MudText>
-            }
-        </MudStack>
-    </MudCardContent>
-</MudCard>
-
+<TermForm> </TermForm>
 @code {
-    List<Term> terms = new List<Term>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await RefreshTerms();
-    }
-
-    private async Task RefreshTerms()
-    {
-        terms = await _termService.GetAllAsync();
-        StateHasChanged();
-    }
 }

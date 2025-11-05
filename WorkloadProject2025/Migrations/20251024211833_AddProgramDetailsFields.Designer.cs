@@ -12,8 +12,8 @@ using WorkloadProject2025.Data;
 namespace WorkloadProject2025.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251022203915_UpdateProgramDepartmentIdToNullable")]
-    partial class UpdateProgramDepartmentIdToNullable
+    [Migration("20251024211833_AddProgramDetailsFields")]
+    partial class AddProgramDetailsFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,7 +238,12 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProgramOfStudyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProgramOfStudyId");
 
                     b.ToTable("Courses");
                 });
@@ -298,9 +303,21 @@ namespace WorkloadProject2025.Migrations
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int>("DurationYears")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Instructor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Tuition")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WorkloadHours")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -425,6 +442,17 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Course", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "ProgramOfStudy")
+                        .WithMany("Courses")
+                        .HasForeignKey("ProgramOfStudyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProgramOfStudy");
+                });
+
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.HasOne("WorkloadProject2025.Data.Models.School", "School")
@@ -450,6 +478,11 @@ namespace WorkloadProject2025.Migrations
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.Navigation("ProgramsOfStudy");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.School", b =>

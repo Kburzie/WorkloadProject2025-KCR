@@ -1,0 +1,248 @@
+@using WorkloadProject2025.Data.Models
+@inject IFacultyWorkloadService workloadService
+@inject IFacultyService facultyService
+@inject ICourseService courseService
+@inject ISnackbar Snackbar
+
+<MudCard Class="mx-auto mt-6 pa-4" Style="max-width: 800px">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6" Class="font-semibold">Add Workload Entry</MudText>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudStack Spacing="3">
+            <!-- Faculty/Instructor Dropdown -->
+            <MudSelect @bind-Value="workload.FacultyEmail" 
+                       Label="Select Faculty/Instructor" 
+                       Required="true"
+                       Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter">
+                @foreach (var faculty in faculties)
+                {
+                    <MudSelectItem Value="@faculty.Email">
+                        @faculty.FirstName @faculty.LastName (@faculty.Email)
+                    </MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Workload Type -->
+            <MudSelect @bind-Value="workload.Type" 
+                       Label="Workload Type" 
+                       Required="true"
+                       Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="WorkloadType.course">Course</MudSelectItem>
+                <MudSelectItem Value="WorkloadType.Coordination">Coordination</MudSelectItem>
+                <MudSelectItem Value="WorkloadType.Project">Project</MudSelectItem>
+            </MudSelect>
+
+            @if (workload.Type == WorkloadType.course)
+            {
+                <!-- Course Dropdown -->
+                <MudSelect @bind-Value="workload.CourseId" 
+                           Label="Select Course" 
+                           Required="true"
+                           Variant="Variant.Outlined"
+                           T="int?"
+                           AnchorOrigin="Origin.BottomCenter">
+                    @foreach (var course in courses)
+                    {
+                        <MudSelectItem T="int?" Value="@course.Id">
+                            @course.Name (@course.Hours hrs)
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+                <!-- Delivery Type -->
+                <MudSelect @bind-Value="workload.DeliveryType" 
+                           Label="Delivery Type" 
+                           Variant="Variant.Outlined"
+                           AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem Value="@("Lecture")">Lecture</MudSelectItem>
+                    <MudSelectItem Value="@("Lab")">Lab</MudSelectItem>
+                    <MudSelectItem Value="@("Tutorial")">Tutorial</MudSelectItem>
+                    <MudSelectItem Value="@("Online")">Online</MudSelectItem>
+                </MudSelect>
+
+                <!-- Hours Per Week Dropdown -->
+                <MudSelect @bind-Value="workload.HoursPerWeek" 
+                           Label="Hours Per Week" 
+                           Required="true"
+                           Variant="Variant.Outlined"
+                           T="decimal?"
+                           AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="decimal?" Value="@((decimal?)1)">1 hour</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)2)">2 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)3)">3 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)4)">4 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)5)">5 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)6)">6 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)8)">8 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)10)">10 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)12)">12 hours</MudSelectItem>
+                </MudSelect>
+
+                <!-- Total Students -->
+                <MudNumericField @bind-Value="workload.TotalStudents" 
+                                 Label="Total Students" 
+                                 Variant="Variant.Outlined"
+                                 Min="0" />
+            }
+            else if (workload.Type == WorkloadType.Coordination)
+            {
+                <!-- Coordination Role -->
+                <MudTextField @bind-Value="workload.CoordinationRole" 
+                              Label="Coordination Role" 
+                              Variant="Variant.Outlined"
+                              Required="true" />
+                              
+                <MudSelect @bind-Value="workload.HoursPerWeek" 
+                           Label="Hours Per Week" 
+                           Required="true"
+                           Variant="Variant.Outlined"
+                           T="decimal?"
+                           AnchorOrigin="Origin.BottomCenter">
+                    <MudSelectItem T="decimal?" Value="@((decimal?)2)">2 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)4)">4 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)6)">6 hours</MudSelectItem>
+                    <MudSelectItem T="decimal?" Value="@((decimal?)8)">8 hours</MudSelectItem>
+                </MudSelect>
+            }
+            else if (workload.Type == WorkloadType.Project)
+            {
+                <!-- Project Name -->
+                <MudTextField @bind-Value="workload.ProjectName" 
+                              Label="Project Name" 
+                              Variant="Variant.Outlined"
+                              Required="true" />
+                              
+                <!-- Project Hours -->
+                <MudNumericField @bind-Value="workload.ProjectHours" 
+                                 Label="Project Hours" 
+                                 Variant="Variant.Outlined"
+                                 Min="0" />
+            }
+
+            <!-- Semester -->
+            <MudSelect @bind-Value="workload.Semester" 
+                       Label="Semester" 
+                       Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Fall 2024")">Fall 2024</MudSelectItem>
+                <MudSelectItem Value="@("Spring 2025")">Spring 2025</MudSelectItem>
+                <MudSelectItem Value="@("Summer 2025")">Summer 2025</MudSelectItem>
+                <MudSelectItem Value="@("Fall 2025")">Fall 2025</MudSelectItem>
+            </MudSelect>
+
+            <!-- Year -->
+            <MudNumericField @bind-Value="workload.Year" 
+                             Label="Year" 
+                             Variant="Variant.Outlined"
+                             Min="2020"
+                             Max="2030" />
+        </MudStack>
+    </MudCardContent>
+
+    <MudCardActions Class="d-flex justify-center">
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Secondary"
+                   Class="mx-2"
+                   OnClick="Cancel">
+            Cancel
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mx-2"
+                   OnClick="Save">
+            Submit
+        </MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    public EventCallback OnWorkloadAdded { get; set; }
+
+    private FacultyWorkload workload { get; set; } = new FacultyWorkload();
+    private List<Faculty> faculties = new List<Faculty>();
+    private List<Course> courses = new List<Course>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        faculties = await facultyService.GetAllAsync();
+        courses = await courseService.GetAllAsync();
+    }
+
+    private void Cancel()
+    {
+        workload = new FacultyWorkload();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(workload.FacultyEmail))
+            {
+                Snackbar.Add("Please select a faculty member", Severity.Warning);
+                return;
+            }
+
+            if (workload.Type == WorkloadType.course)
+            {
+                if (workload.CourseId == null || workload.CourseId == 0)
+                {
+                    Snackbar.Add("Please select a course", Severity.Warning);
+                    return;
+                }
+                if (workload.HoursPerWeek == null)
+                {
+                    Snackbar.Add("Please select hours per week", Severity.Warning);
+                    return;
+                }
+            }
+            else if (workload.Type == WorkloadType.Coordination)
+            {
+                if (string.IsNullOrWhiteSpace(workload.CoordinationRole))
+                {
+                    Snackbar.Add("Please enter coordination role", Severity.Warning);
+                    return;
+                }
+                if (workload.HoursPerWeek == null)
+                {
+                    Snackbar.Add("Please select hours per week", Severity.Warning);
+                    return;
+                }
+            }
+            else if (workload.Type == WorkloadType.Project)
+            {
+                if (string.IsNullOrWhiteSpace(workload.ProjectName))
+                {
+                    Snackbar.Add("Please enter project name", Severity.Warning);
+                    return;
+                }
+            }
+
+            await workloadService.AddAsync(workload);
+            Console.WriteLine($"Saving Workload for Faculty: {workload.FacultyEmail}");
+            
+            Snackbar.Add("Workload entry added successfully!", Severity.Success);
+            
+            // Notify parent component
+            await OnWorkloadAdded.InvokeAsync();
+            
+            Cancel();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving workload: {ex.Message}");
+            Snackbar.Add($"Error saving workload: {ex.Message}", Severity.Error);
+        }
+    }
+}

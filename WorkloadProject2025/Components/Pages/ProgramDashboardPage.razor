@@ -1,0 +1,160 @@
+﻿@page "/program-dashboard"
+@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
+@inject IProgramsOfStudyService _programService
+@inject IDepartmentService _departmentService
+
+<PageTitle>Program Dashboard</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">
+        📊 PROGRAM DATA DASHBOARD
+    </MudText>
+
+    <!-- Search and Filter -->
+    <MudGrid Class="mb-4">
+        <MudItem xs="12" sm="8">
+            <MudTextField @bind-Value="searchTerm" Label="Search Program" Variant="Variant.Outlined" 
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                          OnKeyUp="@(() => FilterAndRender())" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudSelect Value="@selectedDepartmentId" Label="Filter by Department" Variant="Variant.Outlined"
+                       T="int" ValueChanged="@OnDepartmentChanged">
+                <MudSelectItem Value="0">All Departments</MudSelectItem>
+                @foreach (var dept in departments)
+                {
+                    <MudSelectItem Value="@dept.Id">@dept.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Bar Chart -->
+    <MudPaper Elevation="3" Class="pa-4 mb-4">
+        <canvas id="programChart" width="1000" height="400" style="width: 100%; max-width: 1000px;"></canvas>
+    </MudPaper>
+
+    <!-- Selected Program Details -->
+    @if (selectedProgram != null)
+    {
+        <MudPaper Elevation="3" Class="pa-4">
+            <MudText Typo="Typo.h5" GutterBottom="true">Program Details</MudText>
+            <MudDivider Class="mb-3" />
+            
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Name:</strong> @selectedProgram.Name</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Duration:</strong> @selectedProgram.DurationYears year(s)</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Department:</strong> @(selectedProgram.Department?.Name ?? "N/A")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>School:</strong> @(selectedProgram.Department?.School?.Name ?? "N/A")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Instructor:</strong> @(selectedProgram.Instructor ?? "Not assigned")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Workload:</strong> @selectedProgram.WorkloadHours hrs/week</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Tuition:</strong> $@selectedProgram.Tuition.ToString("N2")/year</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudText><strong>Number of Courses:</strong> @(selectedProgram.Courses?.Count ?? 0)</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText><strong>Courses:</strong></MudText>
+                    @if (selectedProgram.Courses != null && selectedProgram.Courses.Any())
+                    {
+                        <MudList T="string" Dense="true">
+                            @foreach (var course in selectedProgram.Courses)
+                            {
+                                <MudListItem T="string">
+                                    <MudText>• @course.Name (@course.Hours hours)</MudText>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudText Color="Color.Secondary">No courses assigned yet</MudText>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    }
+    else
+    {
+        <MudAlert Severity="Severity.Info">Click on a bar in the chart to view program details.</MudAlert>
+    }
+</MudContainer>
+
+@code {
+    private List<ProgramOfStudy> programs = new();
+    private List<Department> departments = new();
+    private ProgramOfStudy? selectedProgram;
+    private string searchTerm = "";
+    private int selectedDepartmentId = 0;
+    private DotNetObjectReference<ProgramDashboardPage>? objRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await FilterAndRender();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        programs = await _programService.GetAllWithDetailsAsync();
+        departments = await _departmentService.GetAllAsync();
+        StateHasChanged();
+    }
+
+    private async Task OnDepartmentChanged(int departmentId)
+    {
+        selectedDepartmentId = departmentId;
+        await FilterAndRender();
+    }
+
+    private async Task FilterAndRender()
+    {
+        var filtered = programs
+            .Where(p => (string.IsNullOrEmpty(searchTerm) || p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                     && (selectedDepartmentId == 0 || p.DepartmentId == selectedDepartmentId))
+            .ToList();
+
+        var labels = filtered.Select(p => p.Name).ToArray();
+        var data = filtered.Select(p => p.Courses?.Count ?? 0).ToArray();
+
+        await JS.InvokeVoidAsync("renderProgramChart", labels, data, objRef);
+    }
+
+    [JSInvokable]
+    public async Task OnBarClickedJS(string programName)
+    {
+        selectedProgram = programs.FirstOrDefault(p => p.Name == programName);
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+
+    [Inject]
+    public IJSRuntime JS { get; set; } = default!;
+}

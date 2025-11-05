@@ -1,76 +1,55 @@
-﻿@page "/DepartmentPage"
-@using WorkloadProject2025.Data.Models
-@inject DepartmentService _deptService
-@inject SchoolService _schoolService
-@inject IDialogService DialogService
+﻿@inject DepartmentService _departmentService;
+@inject SchoolService schoolService;
+@page "/departmentpage"
 
-<MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
+<DepartentForm Schools="schools" OnSaved="Save"></DepartentForm>
+
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
     <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6" Class="font-semibold">Current Departments</MudText>
-        </CardHeaderContent>
-        <CardHeaderActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddDepartmentDialog">Add New Department</MudButton>
-        </CardHeaderActions>
+        <MudText Typo="Typo.h6" Class="font-semibold">Current Departments</MudText>
     </MudCardHeader>
 
     <MudCardContent>
-        <MudDataGrid Items="@departments">
-            <Columns>
-                <PropertyColumn Property="x => x.Name" Title="Department" />
-                <PropertyColumn Property="x => x.School.Name" Title="School" />
-                <TemplateColumn CellClass="d-flex justify-end">
-                    <CellTemplate>
-                        <MudStack Row>
-                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
-                            OnClick="() => DeleteRecord(context.Item)"
-                            >Delete</MudButton>
-                        </MudStack>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-        </MudDataGrid>
+        <MudStack Spacing="2">
+            @foreach (var Dept in departments)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@Dept.Name</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Departments</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            }
+        </MudStack>
     </MudCardContent>
+
 </MudCard>
 
 @code {
+    //Make a list of Schools that we can load
     List<Department> departments = new();
     List<School> schools = new();
-
     protected override async Task OnInitializedAsync()
     {
-        departments = await _deptService.GetAllAsync();
-        schools = await _schoolService.GetAllAsync();
+        departments = await _departmentService.GetAllAsync();
+        schools = await schoolService.GetAllAsync();
+
     }
 
-    private async Task OpenAddDepartmentDialog()
+    public async Task Save()
     {
-        var parameters = new DialogParameters<DepartmentForm>
-        {
-            { x => x.Schools, schools }
-        };
-        
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        var dialog = await DialogService.ShowAsync<DepartmentForm>("Add New Department", parameters, options);
-        var result = await dialog.Result;
-        
-        if (result != null && !result.Canceled)
-        {
-            await ReloadData();
-        }
-    }
-
-    private async Task<bool> DeleteRecord(Department dept)
-    {
-        bool result = await _deptService.DeleteAsync(dept);
-        await ReloadData();
-        
-        return result;
-    }
-
-    private async Task ReloadData()
-    {
-        departments = await _deptService.GetAllAsync();
+        //Refresh our list of schools
+        departments = await _departmentService.GetAllAsync();
         StateHasChanged();
     }
+
+
 }

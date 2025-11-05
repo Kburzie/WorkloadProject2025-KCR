@@ -27,23 +27,9 @@ namespace WorkloadProject2025.Services
             return department;
         }
 
-        public async Task<bool> DeleteAsync(Department department, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                _context.Departments.Remove(department);
-                await _context.SaveChangesAsync();
-            } catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public Task<List<Department>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return _context.Departments.Include(d => d.School).ToListAsync(cancellationToken);
+            return _context.Departments.ToListAsync(cancellationToken);
         }
 
         public Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

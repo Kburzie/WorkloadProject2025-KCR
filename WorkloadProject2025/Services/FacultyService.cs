@@ -39,24 +39,5 @@ namespace WorkloadProject2025.Services
         {
             return _context.Faculty.FirstOrDefaultAsync(faculty => faculty.Email == email);
         }
-
-        public async Task<bool> DeleteAsync(Faculty faculty, CancellationToken cancellationToken = default)
-        {
-            if (faculty == null)
-                return false;
-
-            try
-            {
-                _context.Faculty.Remove(faculty);
-                await _context.SaveChangesAsync(cancellationToken);
-                return true;
-            }
-            catch (Exception)
-            {
-                // In a production environment, this should use proper logging
-                // For now, return false to indicate the operation failed
-                return false;
-            }
-        }
     }
 }

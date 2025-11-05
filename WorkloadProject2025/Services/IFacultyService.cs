@@ -8,8 +8,6 @@ namespace WorkloadProject2025.Services
         Task<List<Faculty>> GetAllAsync(CancellationToken cancellationToken = default);
 
         Task<Faculty?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
-        
-        Task<bool> DeleteAsync(Faculty faculty, CancellationToken cancellationToken = default);
 
     }
 }

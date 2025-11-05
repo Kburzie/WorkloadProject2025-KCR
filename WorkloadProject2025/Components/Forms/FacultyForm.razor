@@ -1,64 +1,101 @@
-﻿@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Data.Models
 @inject FacultyService facultyService
+@inject IWorkloadCategoriesService workloadCategoriesService
 
-<MudDialog>
-    <DialogContent>
-        <EditForm Model="faculty" OnValidSubmit="Save">
-            <DataAnnotationsValidator />
-            <MudStack Spacing="2">
-                <MudStaticTextField For="@(() => faculty.FirstName)"
-                                    @bind-Value="faculty.FirstName"
-                                    Label="First Name"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+<MudCard Class="mx-auto mt-6 pa-4" Style="max-width: 650px">
 
-                <MudStaticTextField For="@(() => faculty.LastName)"
-                                    @bind-Value="faculty.LastName"
-                                    Label="Last Name"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+    <MudCardHeader>
+        <MudText Typo="Typo.h6" Class="font-semibold">Add New Faculty Member</MudText>
+    </MudCardHeader>
 
-                <MudStaticTextField For="@(() => faculty.Email)"
-                                    @bind-Value="faculty.Email"
-                                    Label="Email"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Email" />
+    <MudCardContent>
+        <MudStack Spacing="2">
+            <MudTextField @bind-Value="faculty.FirstName"
+                          Label="First Name"
+                          Required="true"
+                          Class="mb-2"
+                          Style="width:70%"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Person">
+            </MudTextField>
+            <MudTextField @bind-Value="faculty.LastName"
+                          Label="Last Name"
+                          Required="true"
+                          Style="width:70%"
+                          Class="mb-2"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Person">
+            </MudTextField>
+            <MudTextField @bind-Value="faculty.Email"
+                          Label="Email"
+                          Required="true"
+                          Class="mb-2"
+                          Style="width:90%"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Email">
+            </MudTextField>
+            <MudTextField @bind-Value="faculty.PhoneNumber"
+                          Label="Phone"
+                          Required="true"
+                          Class="mb-2"
+                          Style="width:40%"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Phone">
+            </MudTextField>
+            <MudSelect @bind-Value="faculty.WorkloadCategoryId"
+                       Label="Workload Category"
+                       Variant="Variant.Outlined"
+                       AnchorOrigin="Origin.BottomCenter"
+                       Class="mb-2"
+                       Style="width:70%">
+                <MudSelectItem Value="@((int?)null)">None</MudSelectItem>
+                @foreach (var category in workloadCategories)
+                {
+                    <MudSelectItem Value="@((int?)category.Id)">
+                        @category.MiniumHours - @category.MaximumHours hours
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </MudCardContent>
 
-                <MudStaticTextField For="@(() => faculty.PhoneNumber)"
-                                    @bind-Value="faculty.PhoneNumber"
-                                    Label="Phone"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Phone" />
-            </MudStack>
-            <MudCardActions Class="d-flex justify-end mt-4">
-                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
-            </MudCardActions>
-        </EditForm>
-    </DialogContent>
-</MudDialog>
+    <MudCardActions Class="d-flex justify-center">
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Secondary"
+                   Class="mx-2"
+                   OnClick="Cancel">
+            Cancel
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mx-2"
+                   OnClick="Save">
+            Submit
+        </MudButton>
+    </MudCardActions>
+
+</MudCard>
+
 
 @code {
-    [CascadingParameter]
-    IMudDialogInstance MudDialog { get; set; } = default!;
-
-    [Parameter]
-    public EventCallback OnSaved { get; set; }
-
     private Faculty faculty { get; set; } = new Faculty();
+    private List<WorkloadCategory> workloadCategories = new List<WorkloadCategory>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        workloadCategories = await workloadCategoriesService.GetAllAsync();
+    }
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        faculty = new Faculty();
     }
 
     private async Task Save()
     {
         await facultyService.AddAsync(faculty);
-        await OnSaved.InvokeAsync();
-        faculty = new Faculty(); // reset form
-        MudDialog.Close(DialogResult.Ok(true));
-        StateHasChanged();
+        Console.WriteLine($"Saving Faculty: {faculty.Email}");
+        Cancel();
     }
 
 }

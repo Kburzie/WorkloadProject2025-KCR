@@ -2,56 +2,48 @@
 @using WorkloadProject2025.Data.Models
 @using WorkloadProject2025.Services
 @inject CourseService courseService
+@inject ProgramsOfStudyService programsOfStudyService
 
-<h3>Course Page</h3>
+<CoursesForm OnCourseSaved="Save" programOfStudy="programsOfStudy"></CoursesForm>
 
-<div class="row">
-    <div class="col-md-6">
-        <CoursesForm OnCourseSaved="LoadCourses"></CoursesForm>
-    </div>
-    <div class="col-md-6">
-        <MudCard>
-            <MudCardHeader>
-                <MudText Typo="Typo.h6">Course List</MudText>
-            </MudCardHeader>
-            <MudCardContent>
-                @if (courses == null)
-                {
-                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-                }
-                else if (!courses.Any())
-                {
-                    <MudText>No courses available</MudText>
-                }
-                else
-                {
-                    <MudTable Items="@courses" Hover="true" Dense="true">
-                        <HeaderContent>
-                            <MudTh>ID</MudTh>
-                            <MudTh>Course Name</MudTh>
-                            <MudTh>Hours</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="ID">@context.Id</MudTd>
-                            <MudTd DataLabel="Course Name">@context.Name</MudTd>
-                            <MudTd DataLabel="Hours">@context.Hours</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                }
-            </MudCardContent>
-        </MudCard>
-    </div>
-</div>
+<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6" Class="font-semibold">Current Courses</MudText>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudStack Spacing="2">
+            @foreach (var course in courses)
+            {
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@course.Name</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Details</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            }
+        </MudStack>
+    </MudCardContent>
+</MudCard>
 
 @code {
-    private List<Course>? courses;
+    List<Course> courses = new();
+    List<ProgramOfStudy> programsOfStudy = new();
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCourses();
+        courses = await courseService.GetAllAsync();
+        programsOfStudy = await programsOfStudyService.GetAllAsync();
     }
 
-    private async Task LoadCourses()
+    public async Task Save()
     {
         courses = await courseService.GetAllAsync();
         StateHasChanged();

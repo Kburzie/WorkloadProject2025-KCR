@@ -1,59 +1,285 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Home - Workload Management System</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor and the .NET 9 Template!</MudText>
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    <!-- Header Section -->
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">
+        <MudIcon Icon="@Icons.Material.Filled.Dashboard" Size="Size.Large" /> Workload Management Dashboard
+    </MudText>
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6" Color="Color.Secondary">
+        Welcome to your comprehensive workload management system
+    </MudText>
 
-<MudAlert Severity="Severity.Normal" ContentAlignment="HorizontalAlignment.Start">
-    You can find documentation and examples on our website here:
-    <MudLink Href="https://mudblazor.com" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        <b>www.mudblazor.com</b>
-    </MudLink>
-</MudAlert>
+    <!-- Quick Access Features Section -->
+    <MudText Typo="Typo.h5" GutterBottom="true" Class="mt-6 mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.Speed" Class="mr-2" /> Quick Access
+    </MudText>
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateToNotifications())">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Notifications</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">View system alerts</MudText>
+                    <MudBadge Color="Color.Warning" Content="3" Overlap="true" Class="mt-2">
+                        <MudText Typo="Typo.body2">New</MudText>
+                    </MudBadge>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateToAnalytics())">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Analytics" Color="Color.Info" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Analytics</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">View insights & trends</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/faculty-workload-dashboard"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.AutoMode" Color="Color.Success" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Auto Workload</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Automated assignment</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/program-dashboard"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Dashboard" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Dashboard Summary</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Overview & metrics</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">Interactivity in this Template</MudText>
-<br />
-<MudText Typo="Typo.body2">
-    When you opt for the "Global" Interactivity Location, <br />
-    the render modes are defined in App.razor and consequently apply to all child components.<br />
-    In this case, providers are globally set in the MainLayout.<br />
-    <br />
-    On the other hand, if you choose the "Per page/component" Interactivity Location,<br />
-    it is necessary to include the <br />
-    <br />
-    &lt;MudPopoverProvider /&gt; <br />
-    &lt;MudDialogProvider /&gt; <br />
-    &lt;MudSnackbarProvider /&gt; <br />
-    <br />
-    components on every interactive page.<br />
-    <br />
-    If a render mode is not specified for a page, it defaults to Server-Side Rendering (SSR),<br />
-    similar to this page. While MudBlazor allows pages to be rendered in SSR,<br />
-    please note that interactive features, such as buttons and dropdown menus, will not be functional.
-</MudText>
+    <!-- Main Navigation Section -->
+    <MudText Typo="Typo.h5" GutterBottom="true" Class="mt-6 mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.Apps" Class="mr-2" /> Main Modules
+    </MudText>
+    <MudGrid>
+        <!-- Dashboards -->
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/program-dashboard"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Dashboard" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Program Dashboard</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">View program analytics</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/faculty-workload-dashboard"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Analytics" Color="Color.Secondary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Faculty Workload</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage faculty workload</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-<br />
-<MudText Typo="Typo.h5" GutterBottom="true">What's New in Blazor with the Release of .NET 9</MudText>
-<br />
+        <!-- Academic Structure -->
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/schoolpage"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.School" Color="Color.Tertiary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Schools</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage schools</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/departmentpage"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Assessment" Color="Color.Info" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Departments</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage departments</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/programsofstudy"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.PropaneTank" Color="Color.Success" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Programs</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage programs of study</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/coursepage"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Book" Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Courses</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage courses</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-<MudText Typo="Typo.h6" GutterBottom="true">Prerendering</MudText>
-<MudText Typo="Typo.body2" GutterBottom="true">
-    If you're exploring the features of .NET 9 Blazor,<br /> you might be pleasantly surprised to learn that each page is prerendered on the server,<br /> regardless of the selected render mode.<br /><br />
-    This means that you'll need to inject all necessary services on the server,<br /> even when opting for the wasm (WebAssembly) render mode.<br /><br />
-    This prerendering functionality is crucial to ensuring that WebAssembly mode feels fast and responsive,<br /> especially when it comes to initial page load times.<br /><br />
-    For more information on how to detect prerendering and leverage the RenderContext, you can refer to the following link:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issuecomment-1783568121" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
+        <!-- Faculty and Workload -->
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/facultypage"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Faculty</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage faculty members</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/workloadcategories"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.List" Color="Color.Secondary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Workload Categories</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage workload types</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
 
-<br />
-<MudText Typo="Typo.h6" GutterBottom="true">InteractiveAuto</MudText>
-<MudText Typo="Typo.body2">
-    A discussion on how to achieve this can be found here:
-    <MudLink Href="https://github.com/dotnet/aspnetcore/issues/51468#issue-1950424116" Target="_blank" Typo="Typo.body2" Color="Color.Primary">
-        More details
-    </MudLink>
-</MudText>
+        <!-- Administrative -->
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Elevation="3" Class="pa-4" Style="cursor: pointer; height: 100%;" onclick="@(() => NavigateTo("/termpage"))">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Badge" Color="Color.Tertiary" Size="Size.Large" />
+                    <MudText Typo="Typo.h6" Class="mt-2">Terms</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Manage academic terms</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Dashboard Summary Section at Bottom -->
+    <MudText Typo="Typo.h5" GutterBottom="true" Class="mt-8 mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.Summarize" Class="mr-2" /> Dashboard Summary
+    </MudText>
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Total Schools</MudText>
+                        <MudText Typo="Typo.h4" Color="Color.Primary">12</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.School" Color="Color.Primary" Size="Size.Large" />
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Active Faculty</MudText>
+                        <MudText Typo="Typo.h4" Color="Color.Success">48</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Success" Size="Size.Large" />
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Total Courses</MudText>
+                        <MudText Typo="Typo.h4" Color="Color.Info">156</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Book" Color="Color.Info" Size="Size.Large" />
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <div>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Active Programs</MudText>
+                        <MudText Typo="Typo.h4" Color="Color.Warning">24</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.PropaneTank" Color="Color.Warning" Size="Size.Large" />
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Recent Activity Summary -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudText Typo="Typo.h6" GutterBottom="true">
+                    <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Class="mr-2" /> System Overview
+                </MudText>
+                <MudSimpleTable Dense="true" Hover="true" Class="mt-3">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Avg. Workload Hours</td>
+                            <td>38.5 hrs</td>
+                            <td><MudText Typo="Typo.body2" Color="Color.Success">Normal</MudText></td>
+                        </tr>
+                        <tr>
+                            <td>Departments</td>
+                            <td>18</td>
+                            <td><MudText Typo="Typo.body2" Color="Color.Info">Active</MudText></td>
+                        </tr>
+                        <tr>
+                            <td>Terms</td>
+                            <td>4</td>
+                            <td><MudText Typo="Typo.body2" Color="Color.Primary">Current</MudText></td>
+                        </tr>
+                    </tbody>
+                </MudSimpleTable>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudPaper Elevation="4" Class="pa-4">
+                <MudText Typo="Typo.h6" GutterBottom="true">
+                    <MudIcon Icon="@Icons.Material.Filled.Update" Class="mr-2" /> Recent Updates
+                </MudText>
+                <MudStack Class="mt-3">
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <MudIcon Icon="@Icons.Material.Filled.Add" Color="Color.Success" />
+                        <MudText Typo="Typo.body2">New course added: Advanced Programming</MudText>
+                    </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <MudIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Info" />
+                        <MudText Typo="Typo.body2">Faculty workload updated for Spring 2025</MudText>
+                    </MudStack>
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" />
+                        <MudText Typo="Typo.body2">Program dashboard metrics refreshed</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    private void NavigateTo(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+
+    private void NavigateToNotifications()
+    {
+        // Placeholder for notifications page - can be implemented later
+        NavigationManager.NavigateTo("/");
+    }
+
+    private void NavigateToAnalytics()
+    {
+        // Placeholder for analytics page - can be implemented later
+        NavigationManager.NavigateTo("/program-dashboard");
+    }
+}

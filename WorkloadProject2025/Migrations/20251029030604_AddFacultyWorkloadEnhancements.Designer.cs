@@ -12,15 +12,15 @@ using WorkloadProject2025.Data;
 namespace WorkloadProject2025.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251008200534_Fixed the school relation")]
-    partial class Fixedtheschoolrelation
+    [Migration("20251029030604_AddFacultyWorkloadEnhancements")]
+    partial class AddFacultyWorkloadEnhancements
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -238,7 +238,12 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProgramOfStudyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProgramOfStudyId");
 
                     b.ToTable("Courses");
                 });
@@ -270,6 +275,9 @@ namespace WorkloadProject2025.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -282,9 +290,71 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Position")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Email");
 
+                    b.HasIndex("DepartmentId");
+
                     b.ToTable("Faculty");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.FacultyWorkload", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CoordinationRole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DeliveryType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FacultyEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal?>("HoursPerWeek")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("ProjectHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ProjectName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Semester")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TotalStudents")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FacultyEmail");
+
+                    b.ToTable("FacultyWorkloads");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
@@ -295,11 +365,28 @@ namespace WorkloadProject2025.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DurationYears")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Instructor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Tuition")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("WorkloadHours")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("ProgramsOfStudy");
                 });
@@ -420,6 +507,17 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Course", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "ProgramOfStudy")
+                        .WithMany("Courses")
+                        .HasForeignKey("ProgramOfStudyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProgramOfStudy");
+                });
+
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.HasOne("WorkloadProject2025.Data.Models.School", "School")
@@ -429,6 +527,55 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
 
                     b.Navigation("School");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Faculty", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.FacultyWorkload", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("WorkloadProject2025.Data.Models.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyEmail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.Department", "Department")
+                        .WithMany("ProgramsOfStudy")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
+                {
+                    b.Navigation("ProgramsOfStudy");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.School", b =>

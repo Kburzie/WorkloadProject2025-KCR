@@ -2,7 +2,7 @@
 @using WorkloadProject2025.Services
 @inject CourseService courseService
 
-<h3>Courses Form</h3>
+
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
     <MudCardHeader>
@@ -17,12 +17,6 @@
                           Adornment="Adornment.Start"
                           AdornmentIcon="@Icons.Material.Filled.Business" />
 
-            <MudNumericField T="int" 
-                             Label="Course ID"
-                             @bind-Value="course.Id"
-                             Required="true"
-                             Adornment="Adornment.Start"
-                             AdornmentIcon="@Icons.Material.Filled.Badge" />
 
             <MudNumericField T="int"
                             Label="Course Hours"
@@ -30,6 +24,16 @@
                             Required="true"
                             Adornment="Adornment.Start"
                             AdornmentIcon="@Icons.Material.Filled.AccessTime" />
+            <MudSelect T="int"
+                       @bind-value="course.ProgramOfStudyId"
+                       Required="true">
+                @foreach (var prog in programOfStudy)
+                {
+                    <MudSelectItem Value="@prog.Id">@prog.Name</MudSelectItem>
+                }
+
+            </MudSelect>
+            
         </MudStack>
     </MudCardContent>
 
@@ -41,9 +45,12 @@
 
 @code {
     private Course course { get; set; } = new Course();
-    
+
     [Parameter]
     public EventCallback OnCourseSaved { get; set; }
+
+    [Parameter]
+    public List<ProgramOfStudy> programOfStudy { get; set; } = new(); // <-- prevents null
 
     private void Cancel()
     {

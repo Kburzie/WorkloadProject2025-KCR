@@ -37,24 +37,11 @@ namespace WorkloadProject2025.Services
             return _context.WorkloadCategories.FirstOrDefaultAsync(WorkloadCategory => WorkloadCategory.Id == id);
         }
 
-        public Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default)
+
+
+        Task<List<WorkloadCategory>> IWorkloadCategoriesService.GetAllAsync(CancellationToken cancellationToken)
         {
             return _context.WorkloadCategories.ToListAsync();
-        }
-
-        public async Task<bool> DeleteAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                _context.WorkloadCategories.Remove(workloadcategory);
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

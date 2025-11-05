@@ -1,31 +1,377 @@
 ﻿@page "/WorkloadPage"
 @using MudBlazor
+@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
+@inject IFacultyWorkloadService workloadService
+@inject IProgramsOfStudyService programService
+@inject IFacultyService facultyService
+@inject IJSRuntime JSRuntime
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
-    <MudText Typo="Typo.h4" Class="mb-4">Workload</MudText>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Workload Management</MudText>
 
-    <MudTable Items="workloads" Hover="true" Bordered="true" Striped="true">
+    <!-- Action Buttons -->
+    <MudPaper Class="pa-4 mb-4" Elevation="2">
+        <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="ToggleAddForm">
+                Add Workload Entry
+            </MudButton>
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Secondary" 
+                       StartIcon="@Icons.Material.Filled.ContentCopy"
+                       OnClick="OpenCopyWorkloadDialog">
+                Copy Previous Workload
+            </MudButton>
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Tertiary" 
+                       StartIcon="@Icons.Material.Filled.School"
+                       OnClick="OpenCopyProgramDialog">
+                Copy Program to Workload
+            </MudButton>
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Success" 
+                       StartIcon="@Icons.Material.Filled.Download"
+                       OnClick="ExportSelectedWorkloads"
+                       Disabled="@(!selectedWorkloads.Any())">
+                Export Selected (@selectedWorkloads.Count)
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    <!-- Year Filter and Export Section -->
+    <MudPaper Class="pa-4 mb-4" Elevation="2">
+        <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+            <MudSelect Value="selectedYear" 
+                       Label="Select Year" 
+                       Variant="Variant.Outlined"
+                       Style="max-width: 200px;"
+                       T="int?"
+                       AnchorOrigin="Origin.BottomCenter"
+                       ValueChanged="OnYearChanged">
+                <MudSelectItem Value="@((int?)null)">All Years</MudSelectItem>
+                @foreach (var year in availableYears)
+                {
+                    <MudSelectItem Value="@((int?)year)">@year</MudSelectItem>
+                }
+            </MudSelect>
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Info" 
+                       StartIcon="@Icons.Material.Filled.Download"
+                       OnClick="ExportWorkloadByYear"
+                       Disabled="@(selectedYear == null)">
+                Export Year @(selectedYear?.ToString() ?? "")
+            </MudButton>
+        </MudStack>
+    </MudPaper>
+
+    <!-- Add Workload Form -->
+    @if (showAddForm)
+    {
+        <FacultyWorkloadForm OnWorkloadAdded="OnWorkloadAdded" />
+    }
+
+    <!-- Copy Workload Form -->
+    @if (showCopyWorkloadForm)
+    {
+        <MudCard Class="mb-4 pa-4">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Copy Previous Workload</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-2">From:</MudText>
+                        <MudSelect @bind-Value="fromSemester" Label="From Semester" Variant="Variant.Outlined">
+                            <MudSelectItem Value="@("Fall 2023")">Fall 2023</MudSelectItem>
+                            <MudSelectItem Value="@("Spring 2024")">Spring 2024</MudSelectItem>
+                            <MudSelectItem Value="@("Fall 2024")">Fall 2024</MudSelectItem>
+                        </MudSelect>
+                        <MudNumericField @bind-Value="fromYear" Label="From Year" Variant="Variant.Outlined" Min="2020" Max="2030" Class="mt-2" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-2">To:</MudText>
+                        <MudSelect @bind-Value="toSemester" Label="To Semester" Variant="Variant.Outlined">
+                            <MudSelectItem Value="@("Fall 2024")">Fall 2024</MudSelectItem>
+                            <MudSelectItem Value="@("Spring 2025")">Spring 2025</MudSelectItem>
+                            <MudSelectItem Value="@("Summer 2025")">Summer 2025</MudSelectItem>
+                            <MudSelectItem Value="@("Fall 2025")">Fall 2025</MudSelectItem>
+                        </MudSelect>
+                        <MudNumericField @bind-Value="toYear" Label="To Year" Variant="Variant.Outlined" Min="2020" Max="2030" Class="mt-2" />
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton OnClick="() => showCopyWorkloadForm = false">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="CopyWorkload">Copy</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+
+    <!-- Copy Program Form -->
+    @if (showCopyProgramForm)
+    {
+        <MudCard Class="mb-4 pa-4">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Copy Program to Workload</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Spacing="3">
+                    <MudSelect @bind-Value="selectedProgramId" Label="Select Program" Variant="Variant.Outlined">
+                        @foreach (var program in programs)
+                        {
+                            <MudSelectItem Value="@program.Id">@program.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect @bind-Value="selectedFacultyEmailForProgram" Label="Assign to Faculty" Variant="Variant.Outlined">
+                        @foreach (var faculty in faculties)
+                        {
+                            <MudSelectItem Value="@faculty.Email">
+                                @faculty.FirstName @faculty.LastName
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect @bind-Value="programSemester" Label="Semester" Variant="Variant.Outlined">
+                        <MudSelectItem Value="@("Fall 2024")">Fall 2024</MudSelectItem>
+                        <MudSelectItem Value="@("Spring 2025")">Spring 2025</MudSelectItem>
+                        <MudSelectItem Value="@("Summer 2025")">Summer 2025</MudSelectItem>
+                        <MudSelectItem Value="@("Fall 2025")">Fall 2025</MudSelectItem>
+                    </MudSelect>
+                    <MudNumericField @bind-Value="programYear" Label="Year" Variant="Variant.Outlined" Min="2020" Max="2030" />
+                </MudStack>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton OnClick="() => showCopyProgramForm = false">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="CopyProgram" Disabled="@(selectedProgramId == 0 || string.IsNullOrEmpty(selectedFacultyEmailForProgram))">Copy</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+
+    <!-- Workload Table -->
+    <MudTable @ref="table" 
+              Items="@workloads" 
+              Hover="true" 
+              Bordered="true" 
+              Striped="true"
+              MultiSelection="true"
+              @bind-SelectedItems="selectedWorkloads"
+              Dense="true">
         <HeaderContent>
-            <MudTh>Staff</MudTh>
-            <MudTh>Program</MudTh>
-            <MudTh>Course</MudTh>
+            <MudTh>Faculty</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh>Course/Role/Project</MudTh>
             <MudTh>Hours/Week</MudTh>
-            <MudTh>Actions</MudTh>
+            <MudTh>Semester</MudTh>
+            <MudTh>Year</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Staff</MudTd>
-            <MudTd>@context.Program</MudTd>
-            <MudTd>@context.Course</MudTd>
-            <MudTd>@context.HoursPerWeek</MudTd>
-            <MudTd>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Edit</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Error">Delete</MudButton>
+            <MudTd DataLabel="Faculty">@GetFacultyName(context)</MudTd>
+            <MudTd DataLabel="Type">
+                <MudChip T="string" Size="Size.Small" Color="@GetTypeColor(context.Type)">@context.Type</MudChip>
             </MudTd>
+            <MudTd DataLabel="Course/Role/Project">@GetWorkloadDescription(context)</MudTd>
+            <MudTd DataLabel="Hours/Week">@(context.HoursPerWeek?.ToString("F1") ?? context.ProjectHours?.ToString("F1") ?? "N/A")</MudTd>
+            <MudTd DataLabel="Semester">@context.Semester</MudTd>
+            <MudTd DataLabel="Year">@context.Year</MudTd>
         </RowTemplate>
     </MudTable>
 </MudContainer>
 
 @code {
+    private List<FacultyWorkload> workloads = new List<FacultyWorkload>();
+    private List<FacultyWorkload> allWorkloads = new List<FacultyWorkload>();
+    private HashSet<FacultyWorkload> selectedWorkloads = new HashSet<FacultyWorkload>();
+    private bool showAddForm = false;
+    private bool showCopyWorkloadForm = false;
+    private bool showCopyProgramForm = false;
+    private MudTable<FacultyWorkload>? table;
+
+    // Year filter variables
+    private int? selectedYear = null;
+    private List<int> availableYears = new List<int>();
+
+    // Copy Workload variables
+    private string fromSemester = "Fall 2024";
+    private int fromYear = 2024;
+    private string toSemester = "Spring 2025";
+    private int toYear = 2025;
+
+    // Copy Program variables
+    private List<ProgramOfStudy> programs = new List<ProgramOfStudy>();
+    private List<Faculty> faculties = new List<Faculty>();
+    private int selectedProgramId = 0;
+    private string selectedFacultyEmailForProgram = "";
+    private string programSemester = "Spring 2025";
+    private int programYear = 2025;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkloads();
+        await LoadProgramsAndFaculties();
+    }
+
+    private async Task LoadProgramsAndFaculties()
+    {
+        programs = await programService.GetAllAsync();
+        faculties = await facultyService.GetAllAsync();
+    }
+
+    private async Task LoadWorkloads()
+    {
+        allWorkloads = await workloadService.GetAllAsync();
+        
+        // Extract unique years from workloads
+        availableYears = allWorkloads
+            .Where(w => w.Year.HasValue)
+            .Select(w => w.Year!.Value)
+            .Distinct()
+            .OrderByDescending(y => y)
+            .ToList();
+        
+        // Reapply current filter
+        workloads = GetWorkloadsByYear(selectedYear);
+    }
+
+    private List<FacultyWorkload> GetWorkloadsByYear(int? year)
+    {
+        if (year.HasValue)
+        {
+            return allWorkloads.Where(w => w.Year == year.Value).ToList();
+        }
+        return allWorkloads;
+    }
+
+    private void OnYearChanged(int? year)
+    {
+        selectedYear = year;
+        workloads = GetWorkloadsByYear(selectedYear);
+    }
+
+    private string GenerateCsv(IEnumerable<FacultyWorkload> workloads)
+    {
+        var csv = new System.Text.StringBuilder();
+        csv.AppendLine("Faculty Email,Faculty Name,Type,Course,Delivery Type,Hours Per Week,Total Students,Coordination Role,Project Name,Project Hours,Semester,Year");
+        
+        foreach (var workload in workloads)
+        {
+            csv.Append($"\"{workload.FacultyEmail}\",");
+            csv.Append($"\"{GetFacultyName(workload)}\",");
+            csv.Append($"\"{workload.Type}\",");
+            csv.Append($"\"{workload.Course?.Name ?? ""}\",");
+            csv.Append($"\"{workload.DeliveryType ?? ""}\",");
+            csv.Append($"\"{workload.HoursPerWeek ?? 0}\",");
+            csv.Append($"\"{workload.TotalStudents ?? 0}\",");
+            csv.Append($"\"{workload.CoordinationRole ?? ""}\",");
+            csv.Append($"\"{workload.ProjectName ?? ""}\",");
+            csv.Append($"\"{workload.ProjectHours ?? 0}\",");
+            csv.Append($"\"{workload.Semester}\",");
+            csv.AppendLine($"\"{workload.Year}\"");
+        }
+
+        return csv.ToString();
+    }
+
+    private async Task ExportWorkloadByYear()
+    {
+        if (!selectedYear.HasValue) return;
+
+        // Use the already filtered workloads instead of filtering again
+        var yearWorkloads = workloads;
+        
+        if (!yearWorkloads.Any())
+        {
+            Console.WriteLine($"No workloads found for year {selectedYear.Value}");
+            return;
+        }
+
+        var csv = GenerateCsv(yearWorkloads);
+        var fileName = $"workload_{selectedYear.Value}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, csv);
+    }
+
+    private void ToggleAddForm()
+    {
+        showAddForm = !showAddForm;
+    }
+
+    private async Task OnWorkloadAdded()
+    {
+        await LoadWorkloads();
+        showAddForm = false;
+        StateHasChanged();
+    }
+
+    private void OpenCopyWorkloadDialog()
+    {
+        showCopyWorkloadForm = !showCopyWorkloadForm;
+        showCopyProgramForm = false;
+    }
+
+    private void OpenCopyProgramDialog()
+    {
+        showCopyProgramForm = !showCopyProgramForm;
+        showCopyWorkloadForm = false;
+    }
+
+    private async Task CopyWorkload()
+    {
+        await workloadService.CopyWorkloadToSemesterAsync(fromSemester, fromYear, toSemester, toYear);
+        await LoadWorkloads();
+        showCopyWorkloadForm = false;
+    }
+
+    private async Task CopyProgram()
+    {
+        if (selectedProgramId > 0 && !string.IsNullOrEmpty(selectedFacultyEmailForProgram))
+        {
+            await workloadService.CopyProgramCoursesToWorkloadAsync(selectedProgramId, programSemester, programYear, selectedFacultyEmailForProgram);
+            await LoadWorkloads();
+            showCopyProgramForm = false;
+        }
+    }
+
+    private async Task ExportSelectedWorkloads()
+    {
+        if (!selectedWorkloads.Any()) return;
+
+        var csv = GenerateCsv(selectedWorkloads);
+        var fileName = $"workload_export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, csv);
+    }
+
+    private string GetFacultyName(FacultyWorkload workload)
+    {
+        if (workload.Faculty != null)
+        {
+            return $"{workload.Faculty.FirstName} {workload.Faculty.LastName}";
+        }
+        return workload.FacultyEmail ?? "Unknown";
+    }
+
+    private string GetWorkloadDescription(FacultyWorkload workload)
+    {
+        return workload.Type switch
+        {
+            WorkloadType.course => $"{workload.Course?.Name ?? "Unknown Course"} ({workload.DeliveryType})",
+            WorkloadType.Coordination => workload.CoordinationRole ?? "Unknown Role",
+            WorkloadType.Project => workload.ProjectName ?? "Unknown Project",
+            _ => "N/A"
+        };
+    }
+
+    private Color GetTypeColor(WorkloadType type)
+    {
+        return type switch
+        {
+            WorkloadType.course => Color.Primary,
+            WorkloadType.Coordination => Color.Secondary,
+            WorkloadType.Project => Color.Tertiary,
+            _ => Color.Default
+        };
+    }
+
     public class WorkloadItem
     {
         public string Staff { get; set; } = "";
@@ -33,10 +379,4 @@
         public string Course { get; set; } = "";
         public int HoursPerWeek { get; set; }
     }
-
-    private List<WorkloadItem> workloads = new List<WorkloadItem>
-    {
-        new WorkloadItem{ Staff="John Doe", Program="CS", Course="Programming 101", HoursPerWeek=5 },
-        new WorkloadItem{ Staff="Jane Smith", Program="Business", Course="Marketing 201", HoursPerWeek=4 }
-    };
 }

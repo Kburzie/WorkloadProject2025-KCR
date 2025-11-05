@@ -4,11 +4,12 @@
 @inject TermService intakeService
 <MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
     <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Add New Term</MudText>
+        <MudText Typo="Typo.h6" Class="font-semibold">Add New Intake</MudText>
     </MudCardHeader>
 
     <MudCardContent>
         <MudStack Spacing="2">
+
             <MudTextField Label="Term Name"
                           @bind-Value="term.IntakeName"
                           Required="true"
@@ -41,9 +42,6 @@
 
 @code {
 
-    [Parameter]
-    public EventCallback OnTermSaved { get; set; }
-
     // public class Intake
     // {
     //     public string IntakeId { get; set; }
@@ -61,7 +59,6 @@
     {
         await intakeService.AddAsync(term);
         term = new Term(); // reset form after saving
-        await OnTermSaved.InvokeAsync(); // notify parent
     }
 
 }

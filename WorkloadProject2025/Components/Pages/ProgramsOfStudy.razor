@@ -1,29 +1,29 @@
-@inject SchoolService _schoolService;
-@page "/schoolpage"
-
-<SchoolForm OnSaved="Save"></SchoolForm>
+﻿@page "/programsofstudy"
+@inject ProgramsOfStudyService _ProgramOfStudyService;
+@inject DepartmentService _departmentService;
+<ProgramOfStudyForm department="DEPT" OnSaved="Save"></ProgramOfStudyForm>
 
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
     <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Current Schools</MudText>
+        <MudText Typo="Typo.h6" Class="font-semibold">Current Programs</MudText>
     </MudCardHeader>
 
     <MudCardContent>
         <MudStack Spacing="2">
-            @foreach (var school in schools)
+            @foreach (var pos in POS)
             {
                 <MudCard>
                     <MudCardHeader>
                         <CardHeaderContent>
-                            <MudText Typo="Typo.h6">@school.Name</MudText>
+                            <MudText Typo="Typo.h6">@pos.Name</MudText>
                         </CardHeaderContent>
                         <CardHeaderActions>
                             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Departments</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Courses</MudButton>
                     </MudCardActions>
                 </MudCard>
             }
@@ -33,23 +33,22 @@
 </MudCard>
 
 @code {
-    //Make a list of Schools that we can load
-    List<School> schools = new List<School>();
+
+    List<ProgramOfStudy> POS = new List<ProgramOfStudy>();
+    List<Department> DEPT = new();
     //Fires when the page first loads
     protected override async Task OnInitializedAsync()
     {
         //Call our service, to fill our list
-        schools = await _schoolService.GetAllAsync();
+        POS = await _ProgramOfStudyService.GetAllAsync();
+        DEPT = await _departmentService.GetAllAsync();
         //Let the GUI know state changed
-        StateHasChanged();
     }
 
     public async Task Save()
     {
         //Refresh our list of schools
-        schools = await _schoolService.GetAllAsync();
+        POS = await _ProgramOfStudyService.GetAllAsync();
         StateHasChanged();
     }
-
-
 }
