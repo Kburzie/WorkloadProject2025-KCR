@@ -102,7 +102,7 @@
     {
         await facultyService.AddAsync(faculty);
         Console.WriteLine($"Saving Faculty: {faculty.Email}");
-        Cancel();
+        faculty = new Faculty(); // reset form
         await OnSaved.InvokeAsync();
         MudDialog?.Close(DialogResult.Ok(true));
     }

@@ -42,10 +42,8 @@
     private async void Save()
     {
         await schoolService.AddAsync(school);
-        //Now invoke the callback
         await OnSaved.InvokeAsync();
         school = new School(); // reset form
-        //Cancel();
         StateHasChanged();
         MudDialog?.Close(DialogResult.Ok(true));
     }

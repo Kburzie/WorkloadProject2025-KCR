@@ -65,7 +65,7 @@
     {
         await courseService.AddAsync(course);
         await OnCourseSaved.InvokeAsync();
-        Cancel();
+        course = new Course(); // reset form
         MudDialog?.Close(DialogResult.Ok(true));
     }
 }

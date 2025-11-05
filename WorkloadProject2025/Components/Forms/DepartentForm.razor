@@ -61,7 +61,7 @@
     {
         await DepartmentService.AddAsync(department);
         await OnSaved.InvokeAsync();
-        Cancel();
+        department = new Department(); // reset form
         MudDialog?.Close(DialogResult.Ok(true));
     }
 }
