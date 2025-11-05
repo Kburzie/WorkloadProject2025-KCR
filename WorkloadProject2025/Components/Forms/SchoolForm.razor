@@ -44,7 +44,6 @@
         await schoolService.AddAsync(school);
         await OnSaved.InvokeAsync();
         school = new School(); // reset form
-        StateHasChanged();
         MudDialog?.Close(DialogResult.Ok(true));
     }
 }
