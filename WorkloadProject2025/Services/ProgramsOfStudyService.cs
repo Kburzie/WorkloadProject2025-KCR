@@ -24,24 +24,19 @@ public class ProgramsOfStudyService : IProgramsOfStudyService
             throw new Exception("Program must have a name");
         }
 
-        // to add records into a database with EF we just pass in our object and save changes
         _context.ProgramsOfStudy.Add(program);
-        // commit to the db
         await _context.SaveChangesAsync();
-        // return the record
         return program;
     }
 
     public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        // Empty list should be okay
         return _context.ProgramsOfStudy.Include(p => p.Department).ToListAsync(cancellationToken);
     }
 
     public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        //LINQ is a language that lets you write queries in C#
-        return _context.ProgramsOfStudy.FirstOrDefaultAsync(program => program.Id == id);
+        return _context.ProgramsOfStudy.FirstOrDefaultAsync(programOfStudy => programOfStudy.Id == id);
     }
 
     public async Task<bool> DeleteAsync(ProgramOfStudy programOfStudy, CancellationToken cancellationToken = default)

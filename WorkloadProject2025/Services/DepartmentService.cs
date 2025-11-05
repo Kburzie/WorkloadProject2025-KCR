@@ -35,7 +35,7 @@ public class DepartmentService : IDepartmentService
 
     public Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+        return _context.Departments.FirstOrDefaultAsync(department => department.Id == id, cancellationToken);
     }
 
     public async Task<bool> DeleteAsync(Department department, CancellationToken cancellationToken = default)

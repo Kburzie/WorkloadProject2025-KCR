@@ -37,14 +37,14 @@ public class WorkloadCategoriesService : IWorkloadCategoriesService
         return workloadcategory;
     }
 
-    public Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default)
-    {
-        return _context.WorkloadCategories.FirstOrDefaultAsync(WorkloadCategory => WorkloadCategory.Id == id);
-    }
-
     public Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return _context.WorkloadCategories.ToListAsync();
+    }
+
+    public Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return _context.WorkloadCategories.FirstOrDefaultAsync(workloadCategory => workloadCategory.Id == id);
     }
 
     public async Task<bool> DeleteAsync(WorkloadCategory workloadCategory, CancellationToken cancellationToken = default)

@@ -38,7 +38,7 @@ public class TermService : ITermService
 
     public Task<Term?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Terms.FirstOrDefaultAsync(intake => intake.Id == id);
+        return _context.Terms.FirstOrDefaultAsync(term => term.Id == id);
     }
 
     public async Task<bool> DeleteAsync(Term term, CancellationToken cancellationToken = default)

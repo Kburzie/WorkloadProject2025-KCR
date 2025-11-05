@@ -1,12 +1,11 @@
 ﻿using WorkloadProject2025.Data.Models;
 
-namespace WorkloadProject2025.Services.Interfaces
+namespace WorkloadProject2025.Services.Interfaces;
+
+public interface IWorkloadCategoriesService
 {
-    public interface IWorkloadCategoriesService
-    {
-        Task<WorkloadCategory> AddAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default);
-        Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default);
-        Task<bool> DeleteAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default);
-    }
+    Task<WorkloadCategory> AddAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default);
+    Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default);
 }
