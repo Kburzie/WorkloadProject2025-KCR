@@ -1,0 +1,64 @@
+﻿@using WorkloadProject2025.Data.Models
+@inject FacultyService facultyService
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="faculty" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudStack Spacing="2">
+                <MudStaticTextField For="@(() => faculty.FirstName)"
+                                    @bind-Value="faculty.FirstName"
+                                    Label="First Name"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+
+                <MudStaticTextField For="@(() => faculty.LastName)"
+                                    @bind-Value="faculty.LastName"
+                                    Label="Last Name"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+
+                <MudStaticTextField For="@(() => faculty.Email)"
+                                    @bind-Value="faculty.Email"
+                                    Label="Email"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Email" />
+
+                <MudStaticTextField For="@(() => faculty.PhoneNumber)"
+                                    @bind-Value="faculty.PhoneNumber"
+                                    Label="Phone"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Phone" />
+            </MudStack>
+            <MudCardActions Class="d-flex justify-end mt-4">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
+            </MudCardActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    private Faculty faculty { get; set; } = new Faculty();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        await facultyService.AddAsync(faculty);
+        await OnSaved.InvokeAsync();
+        faculty = new Faculty(); // reset form
+        MudDialog.Close(DialogResult.Ok(true));
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,75 @@
+﻿@page "/facultypage"
+@using WorkloadProject2025.Data.Models
+@inject FacultyService _facultyService
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6" Class="font-semibold">Current Faculty</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddFacultyDialog">Add New Faculty</MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateToWorkloadCategory" Class="ml-2">Workload Categories</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudDataGrid Items="@faculty">
+            <Columns>
+                <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+                <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                <PropertyColumn Property="x => x.Email" Title="Email" />
+                <PropertyColumn Property="x => x.PhoneNumber" Title="Phone" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
+                            OnClick="() => DeleteRecord(context.Item)"
+                            >Delete</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    List<Faculty> faculty = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        faculty = await _facultyService.GetAllAsync();
+    }
+
+    private async Task OpenAddFacultyDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<FacultyForm>("Add New Faculty", options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await ReloadData();
+        }
+    }
+
+    private async Task DeleteRecord(Faculty fac)
+    {
+        await _facultyService.DeleteAsync(fac);
+        await ReloadData();
+    }
+
+    private async Task ReloadData()
+    {
+        faculty = await _facultyService.GetAllAsync();
+        StateHasChanged();
+    }
+
+    private void NavigateToWorkloadCategory()
+    {
+        Navigation.NavigateTo("/workloadcategorypage");
+    }
+}

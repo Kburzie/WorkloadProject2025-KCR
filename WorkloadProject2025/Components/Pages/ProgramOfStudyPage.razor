@@ -1,0 +1,76 @@
+﻿@page "/programofstudypage"
+@using WorkloadProject2025.Data.Models
+@inject ProgramsOfStudyService _programService
+@inject DepartmentService _deptService
+@inject IDialogService DialogService
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6" Class="font-semibold">Current Programs</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddProgramDialog">Add New Program</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudDataGrid Items="@programs">
+            <Columns>
+                <PropertyColumn Property="x => x.Name" Title="Program" />
+                <PropertyColumn Property="x => x.Department.Name" Title="Department" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
+                            OnClick="() => DeleteRecord(context.Item)"
+                            >Delete</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    List<ProgramOfStudy> programs = new();
+    List<Department> departments = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        programs = await _programService.GetAllAsync();
+        departments = await _deptService.GetAllAsync();
+    }
+
+    private async Task OpenAddProgramDialog()
+    {
+        var parameters = new DialogParameters<ProgramOfStudyForm>
+        {
+            { x => x.Departments, departments }
+        };
+        
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<ProgramOfStudyForm>("Add New Program", parameters, options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await ReloadData();
+        }
+    }
+
+    private async Task<bool> DeleteRecord(ProgramOfStudy program)
+    {
+        bool result = await _programService.DeleteAsync(program);
+        await ReloadData();
+        
+        return result;
+    }
+
+    private async Task ReloadData()
+    {
+        programs = await _programService.GetAllAsync();
+        StateHasChanged();
+    }
+}

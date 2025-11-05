@@ -1,0 +1,48 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using WorkloadProject2025.Data.Models
+<!--To inject something into the form you use inject-->
+@inject SchoolService schoolService
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="school" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudStack Spacing="2">
+                <MudStaticTextField For="@(() => school.Name)"
+                                    @bind-Value="school.Name"
+                                    Label="School Name"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.School" />
+            </MudStack>
+            <MudCardActions Class="d-flex justify-end mt-4">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
+            </MudCardActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<School> OnSaved { get; set; }
+
+    private School school { get; set; } = new School();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        await schoolService.AddAsync(school);
+        //Now invoke the callback
+        await OnSaved.InvokeAsync();
+        school = new School(); // reset form
+        MudDialog.Close(DialogResult.Ok(true));
+        StateHasChanged();
+    }
+}
