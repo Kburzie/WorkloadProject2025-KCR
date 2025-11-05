@@ -5,13 +5,11 @@
 @inject SchoolService schoolService;
 @inject IDialogService DialogService
 
-<DepartentForm Schools="schools" OnSaved="Save"></DepartentForm>
-
 <MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
         <MudText Typo="Typo.h5" Class="font-semibold">Current Departments</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Department</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;" OnClick="OpenAddDepartmentDialog">Add New Department</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
@@ -46,6 +44,22 @@
         departments = await _departmentService.GetAllAsync();
         schools = await schoolService.GetAllAsync();
 
+    }
+
+    private async Task OpenAddDepartmentDialog()
+    {
+        var parameters = new DialogParameters<DepartentForm>
+        {
+            { x => x.Schools, schools }
+        };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<DepartentForm>("Add New Department", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Save();
+        }
     }
 
     public async Task Save()

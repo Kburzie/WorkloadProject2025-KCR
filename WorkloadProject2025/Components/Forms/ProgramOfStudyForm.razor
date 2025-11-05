@@ -58,12 +58,14 @@
     </MudCardContent>
 
     <MudCardActions Class="justify-end">
-        <MudButton Variant="Variant.Text" Color="Color.Secondary">Cancel</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
     </MudCardActions>
 </MudCard>
 
 @code {
+    [CascadingParameter]
+    MudBlazor.IDialogReference? MudDialog { get; set; }
 
     [Parameter]
     public EventCallback<ProgramOfStudy> OnSaved { get; set; }
@@ -76,6 +78,7 @@
     private void Cancel()
     {
         POS = new ProgramOfStudy(); // reset form
+        MudDialog?.Close(DialogResult.Cancel());
     }
 
     private async void Save()
@@ -84,5 +87,6 @@
         //Now invoke the callback
         await OnSaved.InvokeAsync();
         POS = new ProgramOfStudy();
+        MudDialog?.Close(DialogResult.Ok(true));
     }
 }

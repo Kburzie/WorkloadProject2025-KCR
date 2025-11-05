@@ -4,13 +4,11 @@
 @inject SchoolService _schoolService;
 @inject IDialogService DialogService
 
-<SchoolForm OnSaved="Save"></SchoolForm>
-
 <MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
         <MudText Typo="Typo.h5" Class="font-semibold">Current Schools</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New School</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;" OnClick="OpenAddSchoolDialog">Add New School</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
@@ -44,6 +42,18 @@
         schools = await _schoolService.GetAllAsync();
         //Let the GUI know state changed
         StateHasChanged();
+    }
+
+    private async Task OpenAddSchoolDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<SchoolForm>("Add New School", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Save();
+        }
     }
 
     public async Task Save()

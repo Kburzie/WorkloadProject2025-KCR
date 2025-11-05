@@ -2,6 +2,7 @@
 @using WorkloadProject2025.Data.Models
 <!--To inject something into the form you use inject-->
 @inject SchoolService schoolService
+
 <MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
     <MudCardHeader>
         <MudText Typo="Typo.h6" Class="font-semibold">Add New School</MudText>
@@ -24,6 +25,8 @@
 </MudCard>
 
 @code {
+    [CascadingParameter] 
+    MudBlazor.IDialogReference? MudDialog { get; set; }
 
     [Parameter]
     public EventCallback<School> OnSaved { get; set; }
@@ -33,6 +36,7 @@
     private void Cancel()
     {
         school = new School(); // reset form
+        MudDialog?.Close(DialogResult.Cancel());
     }
 
     private async void Save()
@@ -43,5 +47,6 @@
         school = new School(); // reset form
         //Cancel();
         StateHasChanged();
+        MudDialog?.Close(DialogResult.Ok(true));
     }
 }
