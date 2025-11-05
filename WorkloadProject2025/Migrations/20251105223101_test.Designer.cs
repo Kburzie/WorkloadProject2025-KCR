@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkloadProject2025.Data;
 
@@ -11,9 +12,11 @@ using WorkloadProject2025.Data;
 namespace WorkloadProject2025.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105223101_test")]
+    partial class test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -355,58 +358,6 @@ namespace WorkloadProject2025.Migrations
                     b.ToTable("Terms");
                 });
 
-            modelBuilder.Entity("WorkloadProject2025.Data.Models.Workload", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateAssigned")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FacultyEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("Hours")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProgramOfStudyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TermId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WorkloadCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("FacultyEmail");
-
-                    b.HasIndex("ProgramOfStudyId");
-
-                    b.HasIndex("TermId");
-
-                    b.HasIndex("WorkloadCategoryId");
-
-                    b.ToTable("Workloads");
-                });
-
             modelBuilder.Entity("WorkloadProject2025.Data.Models.WorkloadCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -518,47 +469,6 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
-                });
-
-            modelBuilder.Entity("WorkloadProject2025.Data.Models.Workload", b =>
-                {
-                    b.HasOne("WorkloadProject2025.Data.Models.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId");
-
-                    b.HasOne("WorkloadProject2025.Data.Models.Faculty", "Faculty")
-                        .WithMany()
-                        .HasForeignKey("FacultyEmail")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "ProgramOfStudy")
-                        .WithMany()
-                        .HasForeignKey("ProgramOfStudyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkloadProject2025.Data.Models.Term", "Term")
-                        .WithMany()
-                        .HasForeignKey("TermId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkloadProject2025.Data.Models.WorkloadCategory", "WorkloadCategory")
-                        .WithMany()
-                        .HasForeignKey("WorkloadCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Faculty");
-
-                    b.Navigation("ProgramOfStudy");
-
-                    b.Navigation("Term");
-
-                    b.Navigation("WorkloadCategory");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>

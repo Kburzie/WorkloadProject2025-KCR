@@ -29,6 +29,17 @@
                                     Label="Phone"
                                     Adornment="Adornment.Start"
                                     AdornmentIcon="@Icons.Material.Filled.Phone" />
+
+                <MudSelect T="string"
+                           @bind-Value="faculty.EmploymentType"
+                           Label="Employment Type"
+                           Variant="Variant.Outlined"
+                           AdornmentIcon="@Icons.Material.Filled.Work"
+                           Adornment="Adornment.Start">
+                    <MudSelectItem Value="@("Full-Time")">Full-Time</MudSelectItem>
+                    <MudSelectItem Value="@("Part-Time")">Part-Time</MudSelectItem>
+                    <MudSelectItem Value="@("Other")">Contract</MudSelectItem>
+                </MudSelect>
             </MudStack>
             <MudCardActions Class="d-flex justify-end mt-4">
                 <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>

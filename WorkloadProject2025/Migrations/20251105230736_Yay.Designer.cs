@@ -12,15 +12,15 @@ using WorkloadProject2025.Data;
 namespace WorkloadProject2025.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251008201414_Added the program and dept relationship")]
-    partial class Addedtheprogramanddeptrelationship
+    [Migration("20251105230736_Yay")]
+    partial class Yay
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -238,7 +238,12 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProgramOfStudyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProgramOfStudyId");
 
                     b.ToTable("Courses");
                 });
@@ -269,6 +274,10 @@ namespace WorkloadProject2025.Migrations
                 {
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EmploymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -337,7 +346,7 @@ namespace WorkloadProject2025.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("IntakeName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -347,6 +356,58 @@ namespace WorkloadProject2025.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Terms");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Workload", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateAssigned")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("FacultyEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("Hours")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProgramOfStudyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TermId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkloadCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("FacultyEmail");
+
+                    b.HasIndex("ProgramOfStudyId");
+
+                    b.HasIndex("TermId");
+
+                    b.HasIndex("WorkloadCategoryId");
+
+                    b.ToTable("Workloads");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.WorkloadCategory", b =>
@@ -363,8 +424,12 @@ namespace WorkloadProject2025.Migrations
                     b.Property<int>("MaximumHours")
                         .HasColumnType("int");
 
-                    b.Property<int>("MiniumHours")
+                    b.Property<int>("MinimumHours")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -425,6 +490,17 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Course", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "ProgramOfStudy")
+                        .WithMany("Courses")
+                        .HasForeignKey("ProgramOfStudyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProgramOfStudy");
+                });
+
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.HasOne("WorkloadProject2025.Data.Models.School", "School")
@@ -447,9 +523,55 @@ namespace WorkloadProject2025.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Workload", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId");
+
+                    b.HasOne("WorkloadProject2025.Data.Models.Faculty", "Faculty")
+                        .WithMany()
+                        .HasForeignKey("FacultyEmail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "ProgramOfStudy")
+                        .WithMany()
+                        .HasForeignKey("ProgramOfStudyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkloadProject2025.Data.Models.Term", "Term")
+                        .WithMany()
+                        .HasForeignKey("TermId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkloadProject2025.Data.Models.WorkloadCategory", "WorkloadCategory")
+                        .WithMany()
+                        .HasForeignKey("WorkloadCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Faculty");
+
+                    b.Navigation("ProgramOfStudy");
+
+                    b.Navigation("Term");
+
+                    b.Navigation("WorkloadCategory");
+                });
+
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.Navigation("ProgramsOfStudy");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.School", b =>

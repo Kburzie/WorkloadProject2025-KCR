@@ -5,7 +5,7 @@
 namespace WorkloadProject2025.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateProgramDepartmentIdToNullable : Migration
+    public partial class AddedWorkloadTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

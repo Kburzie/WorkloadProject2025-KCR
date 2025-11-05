@@ -11,5 +11,7 @@ namespace WorkloadProject2025.Data.Models
         [Required]
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
+
+       public string EmploymentType { get; set; }
     }
 }

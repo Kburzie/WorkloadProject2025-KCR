@@ -13,5 +13,6 @@ namespace WorkloadProject2025.Data
         public DbSet<Term> Terms { get; set; }
         public DbSet<WorkloadCategory> WorkloadCategories { get; set; }
         public DbSet<ProgramOfStudy> ProgramsOfStudy { get; set; }
+        public DbSet<Workload> Workloads { get; set; }
     }
 }
