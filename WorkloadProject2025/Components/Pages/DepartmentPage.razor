@@ -4,33 +4,34 @@
 
 <DepartentForm Schools="schools" OnSaved="Save"></DepartentForm>
 
-
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
+<MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Current Departments</MudText>
+        <MudText Typo="Typo.h5" Class="font-semibold">Current Departments</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Department</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
-        <MudStack Spacing="2">
-            @foreach (var Dept in departments)
-            {
-                <MudCard>
-                    <MudCardHeader>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.h6">@Dept.Name</MudText>
-                        </CardHeaderContent>
-                        <CardHeaderActions>
-                            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                        </CardHeaderActions>
-                    </MudCardHeader>
-                    <MudCardActions>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary">View Departments</MudButton>
-                    </MudCardActions>
-                </MudCard>
-            }
-        </MudStack>
+        <MudTable Items="@departments" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>Department</MudTh>
+                <MudTh>School</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Department">@context.Name</MudTd>
+                <MudTd DataLabel="School">@context.School?.Name</MudTd>
+                <MudTd DataLabel="">
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Error" 
+                               Size="Size.Small"
+                               OnClick="@(async () => await DeleteDepartment(context.Id))">
+                        Delete
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     </MudCardContent>
-
 </MudCard>
 
 @code {
@@ -47,6 +48,13 @@
     public async Task Save()
     {
         //Refresh our list of schools
+        departments = await _departmentService.GetAllAsync();
+        StateHasChanged();
+    }
+
+    private async Task DeleteDepartment(int id)
+    {
+        await _departmentService.DeleteAsync(id);
         departments = await _departmentService.GetAllAsync();
         StateHasChanged();
     }

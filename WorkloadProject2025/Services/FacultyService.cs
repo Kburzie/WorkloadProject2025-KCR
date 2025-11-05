@@ -39,5 +39,15 @@ namespace WorkloadProject2025.Services
         {
             return _context.Faculty.FirstOrDefaultAsync(faculty => faculty.Email == email);
         }
+
+        public async Task DeleteAsync(string email, CancellationToken cancellationToken = default)
+        {
+            var faculty = await GetByEmailAsync(email, cancellationToken);
+            if (faculty != null)
+            {
+                _context.Faculty.Remove(faculty);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+        }
     }
 }

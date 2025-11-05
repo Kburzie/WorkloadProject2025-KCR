@@ -29,12 +29,22 @@ namespace WorkloadProject2025.Services
 
         public Task<List<Department>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return _context.Departments.ToListAsync(cancellationToken);
+            return _context.Departments.Include(d => d.School).ToListAsync(cancellationToken);
         }
 
         public Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return _context.Departments.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+        }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var department = await GetByIdAsync(id, cancellationToken);
+            if (department != null)
+            {
+                _context.Departments.Remove(department);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }
