@@ -7,7 +7,7 @@
         <EditForm Model="course" OnValidSubmit="Save">
             <DataAnnotationsValidator />
             <MudStack Spacing="2">
-                <MudStaticTextField For="@(() => course.Name)"
+                <MudTextField For="@(() => course.Name)"
                                     @bind-Value="course.Name"
                                     Label="Course Name"
                                     Required="true"
@@ -20,8 +20,7 @@
                                     T="int?"
                                     Required="true"
                                     Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Book" 
-                                    />
+                                    AdornmentIcon="@Icons.Material.Filled.Book" />
 
                 <MudSelect For="@(() => course.ProgramOfStudyId)"
                            @bind-value="course.ProgramOfStudyId"
@@ -30,7 +29,8 @@
                            Required="true"
                            Immediate="true"
                            Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.School">
+                           AdornmentIcon="@Icons.Material.Filled.School" />
+
                     <MudSelectItem T="int?" Value="@(null)">Select a Program</MudSelectItem>
 
                     @foreach (ProgramOfStudy program in Programs)

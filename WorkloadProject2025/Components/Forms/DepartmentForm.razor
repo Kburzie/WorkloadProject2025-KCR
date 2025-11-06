@@ -7,7 +7,7 @@
         <EditForm Model="department" OnValidSubmit="Save">
             <DataAnnotationsValidator />
             <MudStack Spacing="2">
-                <MudStaticTextField For="@(() => department.Name)"
+                <MudTextField For="@(() => department.Name)"
                                     @bind-Value="department.Name"
                                     Label="Department Name"
                                     Required="true"

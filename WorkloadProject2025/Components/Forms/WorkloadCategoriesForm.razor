@@ -1,5 +1,5 @@
-﻿@using WorkloadProject2025.Data.Models
-@using WorkloadProject2025.Services
+﻿@using System.ComponentModel.DataAnnotations
+@using WorkloadProject2025.Data.Models
 @inject WorkloadCategoriesService workloadCategoryService
 
 <MudDialog>
@@ -7,28 +7,34 @@
         <EditForm Model="workloadCategory" OnValidSubmit="Save">
             <DataAnnotationsValidator />
             <MudStack Spacing="2">
-                <MudTextField Label="Minimum Hours"
+                <MudTextField For="@(() => workloadCategory.MinimumHours)"
                               @bind-Value="workloadCategory.MinimumHours"
+                              Label="Minimum Hours"
+                              T="int"
                               Required="true"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Filled.HourglassBottom" />
-                
-                <MudTextField Label="Maximum Hours"
+
+                <MudTextField For="@(() => workloadCategory.MaximumHours)"
                               @bind-Value="workloadCategory.MaximumHours"
+                              Label="Maximum Hours"
+                              T="int"
                               Required="true"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Filled.HourglassTop" />
 
-                <MudDatePicker Label="Start Date"
+                <MudDatePicker For="@(() => workloadCategory.StartDate)"
                                @bind-Date="workloadCategory.StartDate"
+                               Label="Start Date"
                                DateFormat="MM/dd/yyyy"
                                PickerVariant="PickerVariant.Dialog"
                                Variant="Variant.Filled"
                                Adornment="Adornment.End"
                                AdornmentIcon="@Icons.Material.Filled.CalendarToday" />
 
-                <MudDatePicker Label="End Date"
+                <MudDatePicker For="@(() => workloadCategory.EndDate)"
                                @bind-Date="workloadCategory.EndDate"
+                               Label="End Date"
                                DateFormat="MM/dd/yyyy"
                                PickerVariant="PickerVariant.Dialog"
                                Variant="Variant.Filled"
@@ -37,7 +43,7 @@
             </MudStack>
             <MudCardActions Class="d-flex justify-end mt-4">
                 <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
+                <MudStaticButton Variant="Variant.Text" Color="Color.Secondary" FormAction="FormAction.Submit">Save</MudStaticButton>
             </MudCardActions>
         </EditForm>
     </DialogContent>
@@ -61,7 +67,7 @@
     {
         await workloadCategoryService.AddAsync(workloadCategory);
         await OnSaved.InvokeAsync();
-        workloadCategory = new WorkloadCategory(); // reset form
+        workloadCategory = new WorkloadCategory();
         MudDialog.Close(DialogResult.Ok(true));
         StateHasChanged();
     }

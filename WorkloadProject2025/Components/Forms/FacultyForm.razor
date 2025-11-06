@@ -7,25 +7,25 @@
         <EditForm Model="faculty" OnValidSubmit="Save">
             <DataAnnotationsValidator />
             <MudStack Spacing="2">
-                <MudStaticTextField For="@(() => faculty.FirstName)"
+                <MudTextField For="@(() => faculty.FirstName)"
                                     @bind-Value="faculty.FirstName"
                                     Label="First Name"
                                     Required="true"/>
 
-                <MudStaticTextField For="@(() => faculty.LastName)"
+                <MudTextField For="@(() => faculty.LastName)"
                                     @bind-Value="faculty.LastName"
                                     Label="Last Name"
                                     Required="true"
                                     />
 
-                <MudStaticTextField For="@(() => faculty.Email)"
+                <MudTextField For="@(() => faculty.Email)"
                                     @bind-Value="faculty.Email"
                                     Label="Email"
                                     Required="true"
                                     Adornment="Adornment.Start"
                                     AdornmentIcon="@Icons.Material.Filled.Email" />
 
-                <MudStaticTextField For="@(() => faculty.PhoneNumber)"
+                <MudTextField For="@(() => faculty.PhoneNumber)"
                                     @bind-Value="faculty.PhoneNumber"
                                     Label="Phone Number"
                                     Adornment="Adornment.Start"
