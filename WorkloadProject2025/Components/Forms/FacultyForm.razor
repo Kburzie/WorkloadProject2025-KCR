@@ -1,4 +1,5 @@
 ﻿@using WorkloadProject2025.Data.Models
+@using WorkloadProject2025.Services
 @inject FacultyService facultyService
 
 <MudDialog>
@@ -9,30 +10,30 @@
                 <MudStaticTextField For="@(() => faculty.FirstName)"
                                     @bind-Value="faculty.FirstName"
                                     Label="First Name"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+                                    Required="true"/>
 
                 <MudStaticTextField For="@(() => faculty.LastName)"
                                     @bind-Value="faculty.LastName"
                                     Label="Last Name"
-                                    Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Person" />
+                                    Required="true"
+                                    />
 
                 <MudStaticTextField For="@(() => faculty.Email)"
                                     @bind-Value="faculty.Email"
                                     Label="Email"
+                                    Required="true"
                                     Adornment="Adornment.Start"
                                     AdornmentIcon="@Icons.Material.Filled.Email" />
 
                 <MudStaticTextField For="@(() => faculty.PhoneNumber)"
                                     @bind-Value="faculty.PhoneNumber"
-                                    Label="Phone"
+                                    Label="Phone Number"
                                     Adornment="Adornment.Start"
                                     AdornmentIcon="@Icons.Material.Filled.Phone" />
             </MudStack>
             <MudCardActions Class="d-flex justify-end mt-4">
                 <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
+                <MudStaticButton Variant="Variant.Text" Color="Color.Secondary" FormAction="FormAction.Submit">Save</MudStaticButton>
             </MudCardActions>
         </EditForm>
     </DialogContent>
@@ -56,7 +57,7 @@
     {
         await facultyService.AddAsync(faculty);
         await OnSaved.InvokeAsync();
-        faculty = new Faculty(); // reset form
+        faculty = new Faculty();
         MudDialog.Close(DialogResult.Ok(true));
         StateHasChanged();
     }
