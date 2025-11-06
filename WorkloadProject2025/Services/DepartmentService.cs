@@ -30,7 +30,7 @@ public class DepartmentService : IDepartmentService
 
     public Task<List<Department>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Departments.Include(d => d.School).ToListAsync(cancellationToken);
+        return _context.Departments.ToListAsync(cancellationToken);
     }
 
     public Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

@@ -39,7 +39,7 @@ public class WorkloadCategoriesService : IWorkloadCategoriesService
 
     public Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.WorkloadCategories.ToListAsync();
+        return _context.WorkloadCategories.ToListAsync(cancellationToken);
     }
 
     public Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default)

@@ -31,7 +31,7 @@ public class ProgramsOfStudyService : IProgramsOfStudyService
 
     public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.ProgramsOfStudy.Include(p => p.Department).ToListAsync(cancellationToken);
+        return _context.ProgramsOfStudy.ToListAsync(cancellationToken);
     }
 
     public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

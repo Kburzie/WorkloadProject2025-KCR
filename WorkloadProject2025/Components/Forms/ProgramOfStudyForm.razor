@@ -1,55 +1,54 @@
 @using System.ComponentModel.DataAnnotations
 @using WorkloadProject2025.Data.Models
-@inject ProgramsOfStudyService programService
+@inject ProgramsOfStudyService programOfStudyService
 
 <MudDialog>
     <DialogContent>
-        <EditForm Model="program" OnValidSubmit="Save">
+        <EditForm Model="programOfStudy" OnValidSubmit="Save">
             <DataAnnotationsValidator />
             <MudStack Spacing="2">
-                <MudStaticTextField For="@(() => program.Name)"
-                                    @bind-Value="program.Name"
+                <MudStaticTextField For="@(() => programOfStudy.Name)"
+                                    @bind-Value="programOfStudy.Name"
                                     Label="Program Name"
+                                    Required="true"
                                     Adornment="Adornment.Start"
                                     AdornmentIcon="@Icons.Material.Filled.Business" />
 
-                <MudSelect T="int?"
+                <MudSelect For="@(() => programOfStudy.DepartmentId)"
+                           @bind-value="programOfStudy.DepartmentId"
                            Label="Department"
-                           @bind-value="program.DepartmentId"
-                           For="@(() => program.DepartmentId)"
+                           T="int?"
                            Required="true"
                            Immediate="true"
                            Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.Assessment">
-                    @* (int?) *@
+                           AdornmentIcon="@Icons.Material.Filled.School">
                     <MudSelectItem T="int?" Value="@(null)">Select a Department</MudSelectItem>
 
-                    @foreach (var dept in Departments)
+                    @foreach (Department department in Departments)
                     {
-                        <MudSelectItem T="int?" Value="@dept.Id">@dept.Name</MudSelectItem>
+                        <MudSelectItem T="int?" Value="@department.Id">@department.Name</MudSelectItem>
                     }
                 </MudSelect>
-                <ValidationMessage For="@(() => program.DepartmentId)" />
             </MudStack>
             <MudCardActions Class="d-flex justify-end mt-4">
                 <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                <MudStaticButton Color="Color.Primary" Variant="Variant.Filled" FormAction="FormAction.Submit">Save</MudStaticButton>
+                <MudStaticButton Variant="Variant.Text" Color="Color.Secondary" FormAction="FormAction.Submit">Save</MudStaticButton>
             </MudCardActions>
         </EditForm>
     </DialogContent>
 </MudDialog>
 
 @code {
-    [CascadingParameter] 
+    [CascadingParameter]
     IMudDialogInstance MudDialog { get; set; } = default!;
-
-    [Parameter]
-    public List<Department> Departments { get; set; } = new();
 
     [Parameter]
     public EventCallback OnSaved { get; set; }
 
-    private ProgramOfStudy program { get; set; } = new ProgramOfStudy();
+    [Parameter]
+    public List<Department> Departments { get; set; } = new();
+
+    private ProgramOfStudy programOfStudy { get; set; } = new ProgramOfStudy();
 
     private void Cancel()
     {
@@ -58,9 +57,9 @@
 
     private async Task Save()
     {
-        await programService.AddAsync(program);
+        await programOfStudyService.AddAsync(programOfStudy);
         await OnSaved.InvokeAsync();
-        program = new ProgramOfStudy(); // reset form
+        programOfStudy = new ProgramOfStudy();
         MudDialog.Close(DialogResult.Ok(true));
         StateHasChanged();
     }

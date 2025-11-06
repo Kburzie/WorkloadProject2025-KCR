@@ -34,8 +34,7 @@ public class FacultyService : IFacultyService
 
     public Task<List<Faculty>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Faculty.ToListAsync();
-        
+        return _context.Faculty.ToListAsync(cancellationToken);
     }
 
     public Task<Faculty?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)

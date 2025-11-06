@@ -20,7 +20,7 @@ public class CourseService : ICourseService
             throw new ArgumentNullException();
 
         if (string.IsNullOrWhiteSpace(course.Name))
-            throw new Exception("Course must have a name");
+            throw new Exception("Course must have a name.");
 
         _context.Courses.Add(course);
         await _context.SaveChangesAsync(cancellationToken);

@@ -31,7 +31,7 @@ public class SchoolService : ISchoolService
 
     public Task<List<School>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Schools.ToListAsync();
+        return _context.Schools.ToListAsync(cancellationToken);
     }
 
     public Task<School?> GetByIdAsync(int id, CancellationToken cancellationToken = default)

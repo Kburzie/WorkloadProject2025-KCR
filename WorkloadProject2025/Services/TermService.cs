@@ -33,7 +33,7 @@ public class TermService : ITermService
 
     public Task<List<Term>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Terms.ToListAsync();
+        return _context.Terms.ToListAsync(cancellationToken);
     }
 
     public Task<Term?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
