@@ -12,7 +12,7 @@
                                     Label="Program Name"
                                     Required="true"
                                     Adornment="Adornment.Start"
-                                    AdornmentIcon="@Icons.Material.Filled.Business" />
+                                    AdornmentIcon="@Icons.Material.Filled.BusinessCenter"/>
 
                 <MudSelect For="@(() => programOfStudy.DepartmentId)"
                            @bind-value="programOfStudy.DepartmentId"
@@ -21,7 +21,7 @@
                            Required="true"
                            Immediate="true"
                            Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.School">
+                           AdornmentIcon="@Icons.Material.Filled.Business">
                     <MudSelectItem T="int?" Value="@(null)">Select a Department</MudSelectItem>
 
                     @foreach (Department department in Departments)

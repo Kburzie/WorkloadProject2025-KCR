@@ -2,56 +2,74 @@
 @using WorkloadProject2025.Services
 @inject CourseService courseService
 
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
-    <MudCardHeader>
-        <MudText Typo="Typo.h6" Class="font-semibold">Add New Course</MudText>
-    </MudCardHeader>
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="course" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudStack Spacing="2">
+                <MudStaticTextField For="@(() => course.Name)"
+                                    @bind-Value="course.Name"
+                                    Label="Course Name"
+                                    Required="true"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Book" />
 
-    <MudCardContent>
-        <MudStack Spacing="2">
-            <MudTextField Label="Course Name"
-                          @bind-Value="course.Name"
-                          Required="true"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Business" />
+                <MudTextField For="@(() => course.Hours)"
+                                    @bind-Value="course.Hours"
+                                    Label="Course Hours"
+                                    T="int?"
+                                    Required="true"
+                                    Adornment="Adornment.Start"
+                                    AdornmentIcon="@Icons.Material.Filled.Book" 
+                                    />
 
-            <MudNumericField T="int" 
-                             Label="Course ID"
-                             @bind-Value="course.Id"
-                             Required="true"
-                             Adornment="Adornment.Start"
-                             AdornmentIcon="@Icons.Material.Filled.Badge" />
+                <MudSelect For="@(() => course.ProgramOfStudyId)"
+                           @bind-value="course.ProgramOfStudyId"
+                           Label="Program"
+                           T="int?"
+                           Required="true"
+                           Immediate="true"
+                           Adornment="Adornment.Start"
+                           AdornmentIcon="@Icons.Material.Filled.School">
+                    <MudSelectItem T="int?" Value="@(null)">Select a Program</MudSelectItem>
 
-            <MudNumericField T="int"
-                            Label="Course Hours"
-                            @bind-Value="course.Hours"
-                            Required="true"
-                            Adornment="Adornment.Start"
-                            AdornmentIcon="@Icons.Material.Filled.AccessTime" />
-        </MudStack>
-    </MudCardContent>
-
-    <MudCardActions Class="justify-end">
-        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
-    </MudCardActions>
-</MudCard>
+                    @foreach (ProgramOfStudy program in Programs)
+                    {
+                        <MudSelectItem T="int?" Value="@program.Id">@program.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudStack>
+            <MudCardActions Class="d-flex justify-end mt-4">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudStaticButton Variant="Variant.Text" Color="Color.Secondary" FormAction="FormAction.Submit">Save</MudStaticButton>
+            </MudCardActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
 
 @code {
-    private Course course { get; set; } = new Course();
-    
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
+
     [Parameter]
-    public EventCallback OnCourseSaved { get; set; }
+    public EventCallback OnSaved { get; set; }
+
+    [Parameter]
+    public List<ProgramOfStudy> Programs { get; set; } = new();
+
+    private Course course { get; set; } = new Course();
 
     private void Cancel()
     {
-        course = new Course(); // reset form
+        MudDialog.Cancel();
     }
 
     private async Task Save()
     {
         await courseService.AddAsync(course);
-        await OnCourseSaved.InvokeAsync();
-        Cancel();
+        await OnSaved.InvokeAsync();
+        course = new Course();
+        MudDialog.Close(DialogResult.Ok(true));
+        StateHasChanged();
     }
 }
