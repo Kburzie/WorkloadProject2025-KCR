@@ -1,6 +1,4 @@
-﻿@using WorkloadProject2025.Data.Models
-@using WorkloadProject2025.Services
-@inject CourseService courseService
+﻿@inject CourseService courseService
 
 <MudDialog>
     <DialogContent>
@@ -29,8 +27,7 @@
                            Required="true"
                            Immediate="true"
                            Adornment="Adornment.Start"
-                           AdornmentIcon="@Icons.Material.Filled.School" />
-
+                           AdornmentIcon="@Icons.Material.Filled.School">
                     <MudSelectItem T="int?" Value="@(null)">Select a Program</MudSelectItem>
 
                     @foreach (ProgramOfStudy program in Programs)

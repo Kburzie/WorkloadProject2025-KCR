@@ -22,10 +22,10 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 //This is important, you need to register an instance of your service otherwise you cant inject it
 builder.Services.AddScoped<SchoolService>();
-builder.Services.AddScoped<WorkloadCategoriesService>();
+builder.Services.AddScoped<WorkloadCategoryService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<FacultyService>();
-builder.Services.AddScoped<ProgramsOfStudyService>();
+builder.Services.AddScoped<ProgramOfStudyService>();
 builder.Services.AddScoped<TermService>();
 builder.Services.AddScoped<DepartmentService>();
 

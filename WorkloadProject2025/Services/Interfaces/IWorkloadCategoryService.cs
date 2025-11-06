@@ -2,7 +2,7 @@
 
 namespace WorkloadProject2025.Services.Interfaces;
 
-public interface IWorkloadCategoriesService
+public interface IWorkloadCategoryService
 {
     Task<WorkloadCategory> AddAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default);
     Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default);

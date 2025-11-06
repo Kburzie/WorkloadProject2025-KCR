@@ -1,38 +1,31 @@
 ﻿@page "/termpage"
-@inject TermService _termService
+@inject IDialogService DialogService;
+@inject TermService termService;
 
-<TermForm OnTermSaved="RefreshTerms"></TermForm>
-
-<MudCard Class="mx-auto mt-6" Style="max-width: 450px;">
+<MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
     <MudCardHeader>
         <CardHeaderContent>
             <MudText Typo="Typo.h6" Class="font-semibold">Current Terms</MudText>
         </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddSchoolDialog">Add New Term</MudButton>
+        </CardHeaderActions>
     </MudCardHeader>
 
     <MudCardContent>
-        <MudStack Spacing="2">
-            @if (terms.Any())
-            {
-                @foreach (var term in terms)
-                {
-                    <MudCard>
-                        <MudCardHeader>
-                            <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@term.Name</MudText>
-                                <MudText Typo="Typo.body2">
-                                    @(term.StartDate?.ToString("MM/dd/yyyy") ?? "N/A") - @(term.EndDate?.ToString("MM/dd/yyyy") ?? "N/A")
-                                </MudText>
-                            </CardHeaderContent>
-                        </MudCardHeader>
-                    </MudCard>
-                }
-            }
-            else
-            {
-                <MudText Typo="Typo.body2" Color="Color.Secondary">No terms available.</MudText>
-            }
-        </MudStack>
+        <MudDataGrid Items="@terms">
+            <Columns>
+                <PropertyColumn Property="x => x.Name" Title="Term" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
+                                       OnClick="() => DeleteRecord(context.Item)">Delete</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
     </MudCardContent>
 </MudCard>
 
@@ -41,12 +34,37 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshTerms();
+        terms = await termService.GetAllAsync();
     }
 
-    private async Task RefreshTerms()
+    private async Task OpenAddSchoolDialog()
     {
-        terms = await _termService.GetAllAsync();
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+        var dialog = await DialogService.ShowAsync<TermForm>("Add New Term", options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            await ReloadData();
+        }
+    }
+
+    private async Task<bool> DeleteRecord(Term term)
+    {
+        bool result = await termService.DeleteAsync(term);
+        await ReloadData();
+
+        return result;
+    }
+
+    public async Task ReloadData()
+    {
+        terms = await termService.GetAllAsync();
         StateHasChanged();
     }
 }

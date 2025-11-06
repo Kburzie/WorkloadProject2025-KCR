@@ -1,7 +1,6 @@
 ﻿@page "/facultypage"
-@using WorkloadProject2025.Data.Models
-@inject FacultyService _facultyService
 @inject IDialogService DialogService
+@inject FacultyService facultyService
 @inject NavigationManager Navigation
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
@@ -41,7 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        faculty = await _facultyService.GetAllAsync();
+        faculty = await facultyService.GetAllAsync();
     }
 
     private async Task OpenAddFacultyDialog()
@@ -58,13 +57,13 @@
 
     private async Task DeleteRecord(Faculty fac)
     {
-        await _facultyService.DeleteAsync(fac);
+        await facultyService.DeleteAsync(fac);
         await ReloadData();
     }
 
     private async Task ReloadData()
     {
-        faculty = await _facultyService.GetAllAsync();
+        faculty = await facultyService.GetAllAsync();
         StateHasChanged();
     }
 

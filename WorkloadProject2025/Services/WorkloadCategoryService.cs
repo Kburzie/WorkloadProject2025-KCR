@@ -5,11 +5,11 @@ using WorkloadProject2025.Services.Interfaces;
 
 namespace WorkloadProject2025.Services;
 
-public class WorkloadCategoriesService : IWorkloadCategoriesService
+public class WorkloadCategoryService : IWorkloadCategoryService
 {
     ApplicationDbContext _context;
 
-    public WorkloadCategoriesService(ApplicationDbContext db)
+    public WorkloadCategoryService(ApplicationDbContext db)
     {
         _context = db;
     }

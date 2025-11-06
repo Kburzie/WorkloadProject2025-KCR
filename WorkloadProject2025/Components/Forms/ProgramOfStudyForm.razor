@@ -1,6 +1,4 @@
-@using System.ComponentModel.DataAnnotations
-@using WorkloadProject2025.Data.Models
-@inject ProgramsOfStudyService programOfStudyService
+@inject ProgramOfStudyService programService
 
 <MudDialog>
     <DialogContent>
@@ -57,7 +55,7 @@
 
     private async Task Save()
     {
-        await programOfStudyService.AddAsync(programOfStudy);
+        await programService.AddAsync(programOfStudy);
         await OnSaved.InvokeAsync();
         programOfStudy = new ProgramOfStudy();
         MudDialog.Close(DialogResult.Ok(true));

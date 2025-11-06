@@ -14,5 +14,5 @@ public class Course
     [Required(ErrorMessage = "You must select a program")]
     public int? ProgramOfStudyId { get; set; }
 
-    public ProgramOfStudy? ProgramOfStudy { get; set; } = new();
+    public ProgramOfStudy? Program { get; set; } = new();
 }

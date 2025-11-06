@@ -5,11 +5,11 @@ using WorkloadProject2025.Services.Interfaces;
 
 namespace WorkloadProject2025.Services;
 
-public class ProgramsOfStudyService : IProgramsOfStudyService
+public class ProgramOfStudyService : IProgramOfStudyService
 {
     ApplicationDbContext _context;
 
-    public ProgramsOfStudyService(ApplicationDbContext db)
+    public ProgramOfStudyService(ApplicationDbContext db)
     {
         _context = db;
     }

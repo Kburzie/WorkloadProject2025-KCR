@@ -1,8 +1,7 @@
-﻿@page "/DepartmentPage"
-@using WorkloadProject2025.Data.Models
-@inject DepartmentService _deptService
-@inject SchoolService _schoolService
+﻿@page "/departmentpage"
 @inject IDialogService DialogService
+@inject SchoolService schoolService
+@inject DepartmentService departmentService
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
     <MudCardHeader>
@@ -34,13 +33,13 @@
 </MudCard>
 
 @code {
-    List<Department> departments = new();
     List<School> schools = new();
+    List<Department> departments = new();
 
     protected override async Task OnInitializedAsync()
     {
-        departments = await _deptService.GetAllAsync();
-        schools = await _schoolService.GetAllAsync();
+        schools = await schoolService.GetAllAsync();
+        departments = await departmentService.GetAllAsync();
     }
 
     private async Task OpenAddDepartmentDialog()
@@ -50,7 +49,12 @@
             { x => x.Schools, schools }
         };
         
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions 
+        { 
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
         var dialog = await DialogService.ShowAsync<DepartmentForm>("Add New Department", parameters, options);
         var result = await dialog.Result;
         
@@ -60,9 +64,9 @@
         }
     }
 
-    private async Task<bool> DeleteRecord(Department dept)
+    private async Task<bool> DeleteRecord(Department department)
     {
-        bool result = await _deptService.DeleteAsync(dept);
+        bool result = await departmentService.DeleteAsync(department);
         await ReloadData();
         
         return result;
@@ -70,7 +74,7 @@
 
     private async Task ReloadData()
     {
-        departments = await _deptService.GetAllAsync();
+        departments = await departmentService.GetAllAsync();
         StateHasChanged();
     }
 }
