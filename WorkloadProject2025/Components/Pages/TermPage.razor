@@ -8,14 +8,16 @@
             <MudText Typo="Typo.h6" Class="font-semibold">Current Terms</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddSchoolDialog">Add New Term</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddTermDialog">Add New Term</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
 
     <MudCardContent>
         <MudDataGrid Items="@terms">
             <Columns>
-                <PropertyColumn Property="x => x.Name" Title="Term" />
+                <PropertyColumn Property="x => x.Name" Title="Term Name" />
+                <PropertyColumn Property="x => x.StartDate" Title="Start Date" />
+                <PropertyColumn Property="x => x.EndDate" Title="End Date" />
                 <TemplateColumn CellClass="d-flex justify-end">
                     <CellTemplate>
                         <MudStack Row>
@@ -37,7 +39,7 @@
         terms = await termService.GetAllAsync();
     }
 
-    private async Task OpenAddSchoolDialog()
+    private async Task OpenAddTermDialog()
     {
         var options = new DialogOptions
         {

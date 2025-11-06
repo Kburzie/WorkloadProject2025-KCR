@@ -1,7 +1,6 @@
 ﻿@page "/facultypage"
 @inject IDialogService DialogService
 @inject FacultyService facultyService
-@inject NavigationManager Navigation
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
     <MudCardHeader>
@@ -10,7 +9,6 @@
         </CardHeaderContent>
         <CardHeaderActions>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddFacultyDialog">Add New Faculty</MudButton>
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateToWorkloadCategory" Class="ml-2">Workload Categories</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
 
@@ -25,8 +23,7 @@
                     <CellTemplate>
                         <MudStack Row>
                             <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
-                            OnClick="() => DeleteRecord(context.Item)"
-                            >Delete</MudButton>
+                                       OnClick="() => DeleteRecord(context.Item)">Delete</MudButton>
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
@@ -45,7 +42,12 @@
 
     private async Task OpenAddFacultyDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
         var dialog = await DialogService.ShowAsync<FacultyForm>("Add New Faculty", options);
         var result = await dialog.Result;
         
@@ -55,20 +57,17 @@
         }
     }
 
-    private async Task DeleteRecord(Faculty fac)
+    private async Task<bool> DeleteRecord(Faculty faculty)
     {
-        await facultyService.DeleteAsync(fac);
+        bool result = await facultyService.DeleteAsync(faculty);
         await ReloadData();
+
+        return result;
     }
 
     private async Task ReloadData()
     {
         faculty = await facultyService.GetAllAsync();
         StateHasChanged();
-    }
-
-    private void NavigateToWorkloadCategory()
-    {
-        Navigation.NavigateTo("/workloadcategorypage");
     }
 }

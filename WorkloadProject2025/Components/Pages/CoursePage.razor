@@ -17,6 +17,7 @@
         <MudDataGrid Items="@courses">
             <Columns>
                 <PropertyColumn Property="x => x.Name" Title="Course" />
+                <PropertyColumn Property="x => x.Hours" Title="Hours" />
                 <PropertyColumn Property="x => x.Program.Name" Title="Program" />
                 <TemplateColumn CellClass="d-flex justify-end">
                     <CellTemplate>

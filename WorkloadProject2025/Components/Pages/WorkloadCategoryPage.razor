@@ -23,8 +23,7 @@
                     <CellTemplate>
                         <MudStack Row>
                             <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
-                            OnClick="() => DeleteRecord(context.Item)"
-                            >Delete</MudButton>
+                                       OnClick="() => DeleteRecord(context.Item)">Delete</MudButton>
                         </MudStack>
                     </CellTemplate>
                 </TemplateColumn>
@@ -43,10 +42,15 @@
 
     private async Task OpenAddWorkloadCategoryDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
         var dialog = await DialogService.ShowAsync<WorkloadCategoryForm>("Add New Workload Category", options);
         var result = await dialog.Result;
-        
+
         if (result != null && !result.Canceled)
         {
             await ReloadData();
@@ -57,7 +61,7 @@
     {
         bool result = await workloadCategoryService.DeleteAsync(workloadCategory);
         await ReloadData();
-        
+
         return result;
     }
 
