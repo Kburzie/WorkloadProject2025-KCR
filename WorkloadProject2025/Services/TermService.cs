@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class TermService : ITermService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public TermService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<Term> AddAsync(Term intake, CancellationToken cancellationToken = default)
@@ -25,20 +25,20 @@ public class TermService : ITermService
         if (intake.EndDate <= intake.StartDate)
             throw new ArgumentException("End date must be after start date");
 
-        _context.Terms.Add(intake);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Terms.Add(intake);
+        await context.SaveChangesAsync(cancellationToken);
         return intake;
         
     }
 
     public Task<List<Term>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Terms.ToListAsync(cancellationToken);
+        return context.Terms.ToListAsync(cancellationToken);
     }
 
     public Task<Term?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Terms.FirstOrDefaultAsync(term => term.Id == id);
+        return context.Terms.FirstOrDefaultAsync(term => term.Id == id);
     }
 
     public async Task<bool> DeleteAsync(Term term, CancellationToken cancellationToken = default)
@@ -46,8 +46,8 @@ public class TermService : ITermService
         bool result = false;
         try
         {
-            _context.Terms.Remove(term);
-            await _context.SaveChangesAsync();
+            context.Terms.Remove(term);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

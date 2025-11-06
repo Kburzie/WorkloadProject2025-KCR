@@ -235,7 +235,12 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProgramOfStudyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProgramOfStudyId");
 
                     b.ToTable("Courses");
                 });
@@ -334,7 +339,7 @@ namespace WorkloadProject2025.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("IntakeName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -360,7 +365,7 @@ namespace WorkloadProject2025.Migrations
                     b.Property<int>("MaximumHours")
                         .HasColumnType("int");
 
-                    b.Property<int>("MiniumHours")
+                    b.Property<int>("MinimumHours")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
@@ -369,6 +374,23 @@ namespace WorkloadProject2025.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WorkloadCategories");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.WorkloadType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkloadTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -422,6 +444,17 @@ namespace WorkloadProject2025.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.Course", b =>
+                {
+                    b.HasOne("WorkloadProject2025.Data.Models.ProgramOfStudy", "Program")
+                        .WithMany("Courses")
+                        .HasForeignKey("ProgramOfStudyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Program");
+                });
+
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.HasOne("WorkloadProject2025.Data.Models.School", "School")
@@ -447,6 +480,11 @@ namespace WorkloadProject2025.Migrations
             modelBuilder.Entity("WorkloadProject2025.Data.Models.Department", b =>
                 {
                     b.Navigation("ProgramsOfStudy");
+                });
+
+            modelBuilder.Entity("WorkloadProject2025.Data.Models.ProgramOfStudy", b =>
+                {
+                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("WorkloadProject2025.Data.Models.School", b =>

@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class CourseService : ICourseService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public CourseService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<Course> AddAsync(Course course, CancellationToken cancellationToken = default)
@@ -22,19 +22,19 @@ public class CourseService : ICourseService
         if (string.IsNullOrWhiteSpace(course.Name))
             throw new Exception("Course must have a name.");
 
-        _context.Courses.Add(course);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Courses.Add(course);
+        await context.SaveChangesAsync(cancellationToken);
         return course;
     }
 
     public Task<List<Course>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Courses.ToListAsync(cancellationToken);
+        return context.Courses.ToListAsync(cancellationToken);
     }
 
     public Task<Course?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Courses.FirstOrDefaultAsync(course => course.Id == id, cancellationToken);
+        return context.Courses.FirstOrDefaultAsync(course => course.Id == id, cancellationToken);
     }
 
     public async Task<bool> DeleteAsync(Course course, CancellationToken cancellationToken = default)
@@ -42,8 +42,8 @@ public class CourseService : ICourseService
         bool result = false;
         try
         {
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+            context.Courses.Remove(course);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

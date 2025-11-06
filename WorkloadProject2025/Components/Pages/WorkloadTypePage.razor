@@ -1,0 +1,70 @@
+@page "/workloadtypepage"
+@inject IDialogService DialogService;
+@inject WorkloadTypeService workloadTypeService;
+
+<MudCard Class="mx-auto mt-6" Style="max-width: 800px;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6" Class="font-semibold">Current Workload Types</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddSchoolDialog">Add New Workload Type</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+
+    <MudCardContent>
+        <MudDataGrid Items="@types">
+            <Columns>
+                <PropertyColumn Property="x => x.Name" Title="Name" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudStack Row>
+                            <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Secondary"
+                                       OnClick="() => DeleteRecord(context.Item)">Delete</MudButton>
+                        </MudStack>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    List<WorkloadType> types = new List<WorkloadType>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        types = await workloadTypeService.GetAllAsync();
+    }
+
+    private async Task OpenAddSchoolDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+        var dialog = await DialogService.ShowAsync<WorkloadTypeForm>("Add New Workload Type", options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            await ReloadData();
+        }
+    }
+
+    private async Task<bool> DeleteRecord(WorkloadType school)
+    {
+        bool result = await workloadTypeService.DeleteAsync(school);
+        await ReloadData();
+
+        return result;
+    }
+
+    public async Task ReloadData()
+    {
+        types = await workloadTypeService.GetAllAsync();
+        StateHasChanged();
+    }
+}

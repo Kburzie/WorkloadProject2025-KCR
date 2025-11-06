@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class ProgramOfStudyService : IProgramOfStudyService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public ProgramOfStudyService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<ProgramOfStudy> AddAsync(ProgramOfStudy program, CancellationToken cancellationToken = default)
@@ -24,19 +24,19 @@ public class ProgramOfStudyService : IProgramOfStudyService
             throw new Exception("Program must have a name");
         }
 
-        _context.ProgramsOfStudy.Add(program);
-        await _context.SaveChangesAsync();
+        context.ProgramsOfStudy.Add(program);
+        await context.SaveChangesAsync();
         return program;
     }
 
     public Task<List<ProgramOfStudy>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.ProgramsOfStudy.ToListAsync(cancellationToken);
+        return context.ProgramsOfStudy.ToListAsync(cancellationToken);
     }
 
     public Task<ProgramOfStudy?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.ProgramsOfStudy.FirstOrDefaultAsync(programOfStudy => programOfStudy.Id == id);
+        return context.ProgramsOfStudy.FirstOrDefaultAsync(programOfStudy => programOfStudy.Id == id);
     }
 
     public async Task<bool> DeleteAsync(ProgramOfStudy programOfStudy, CancellationToken cancellationToken = default)
@@ -44,8 +44,8 @@ public class ProgramOfStudyService : IProgramOfStudyService
         bool result = false;
         try
         {
-            _context.ProgramsOfStudy.Remove(programOfStudy);
-            await _context.SaveChangesAsync();
+            context.ProgramsOfStudy.Remove(programOfStudy);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

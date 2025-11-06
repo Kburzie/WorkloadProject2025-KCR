@@ -23,6 +23,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 //This is important, you need to register an instance of your service otherwise you cant inject it
 builder.Services.AddScoped<SchoolService>();
 builder.Services.AddScoped<WorkloadCategoryService>();
+builder.Services.AddScoped<WorkloadTypeService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<FacultyService>();
 builder.Services.AddScoped<ProgramOfStudyService>();

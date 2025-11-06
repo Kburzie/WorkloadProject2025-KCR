@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class SchoolService : ISchoolService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public SchoolService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<School> AddAsync(School school, CancellationToken cancellationToken = default)
@@ -23,20 +23,19 @@ public class SchoolService : ISchoolService
         {
             throw new Exception("School must have a name");
         }
-        _context.Schools.Add(school);
-        await _context.SaveChangesAsync();
+        context.Schools.Add(school);
+        await context.SaveChangesAsync();
         return school;
-
     }
 
     public Task<List<School>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Schools.ToListAsync(cancellationToken);
+        return context.Schools.ToListAsync(cancellationToken);
     }
 
     public Task<School?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Schools.FirstOrDefaultAsync(school => school.Id == id);
+        return context.Schools.FirstOrDefaultAsync(school => school.Id == id);
     }
 
     public async Task<bool> DeleteAsync(School school, CancellationToken cancellationToken = default)
@@ -44,8 +43,8 @@ public class SchoolService : ISchoolService
         bool result = false;
         try
         {
-            _context.Schools.Remove(school);
-            await _context.SaveChangesAsync();
+            context.Schools.Remove(school);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

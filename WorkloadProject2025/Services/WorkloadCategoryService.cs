@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class WorkloadCategoryService : IWorkloadCategoryService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public WorkloadCategoryService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<WorkloadCategory> AddAsync(WorkloadCategory workloadcategory, CancellationToken cancellationToken = default)
@@ -31,20 +31,20 @@ public class WorkloadCategoryService : IWorkloadCategoryService
         {
             throw new Exception("The End Date must be After the Start Date");
         }
-        _context.WorkloadCategories.Add(workloadcategory);
-        await _context.SaveChangesAsync();
+        context.WorkloadCategories.Add(workloadcategory);
+        await context.SaveChangesAsync();
 
         return workloadcategory;
     }
 
     public Task<List<WorkloadCategory>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.WorkloadCategories.ToListAsync(cancellationToken);
+        return context.WorkloadCategories.ToListAsync(cancellationToken);
     }
 
     public Task<WorkloadCategory?> GetByIDAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.WorkloadCategories.FirstOrDefaultAsync(workloadCategory => workloadCategory.Id == id);
+        return context.WorkloadCategories.FirstOrDefaultAsync(workloadCategory => workloadCategory.Id == id);
     }
 
     public async Task<bool> DeleteAsync(WorkloadCategory workloadCategory, CancellationToken cancellationToken = default)
@@ -52,8 +52,8 @@ public class WorkloadCategoryService : IWorkloadCategoryService
         bool result = false;
         try
         {
-            _context.WorkloadCategories.Remove(workloadCategory);
-            await _context.SaveChangesAsync();
+            context.WorkloadCategories.Remove(workloadCategory);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

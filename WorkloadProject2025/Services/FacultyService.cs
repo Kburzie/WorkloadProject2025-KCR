@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class FacultyService : IFacultyService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public FacultyService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<Faculty> AddAsync(Faculty faculty, CancellationToken cancellationToken = default)
@@ -23,9 +23,9 @@ public class FacultyService : IFacultyService
         {
             throw new Exception("Email must be entered");
         }
-        _context.Faculty.Add(faculty);
+        context.Faculty.Add(faculty);
 
-       await _context.SaveChangesAsync();
+       await context.SaveChangesAsync();
 
         return faculty;   
         
@@ -34,12 +34,12 @@ public class FacultyService : IFacultyService
 
     public Task<List<Faculty>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Faculty.ToListAsync(cancellationToken);
+        return context.Faculty.ToListAsync(cancellationToken);
     }
 
     public Task<Faculty?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        return _context.Faculty.FirstOrDefaultAsync(faculty => faculty.Email == email);
+        return context.Faculty.FirstOrDefaultAsync(faculty => faculty.Email == email);
     }
 
     public async Task<bool> DeleteAsync(Faculty faculty, CancellationToken cancellationToken = default)
@@ -47,8 +47,8 @@ public class FacultyService : IFacultyService
         bool result = false;
         try
         {
-            _context.Faculty.Remove(faculty);
-            await _context.SaveChangesAsync();
+            context.Faculty.Remove(faculty);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

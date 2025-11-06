@@ -7,11 +7,11 @@ namespace WorkloadProject2025.Services;
 
 public class DepartmentService : IDepartmentService
 {
-    ApplicationDbContext _context;
+    ApplicationDbContext context;
 
     public DepartmentService(ApplicationDbContext db)
     {
-        _context = db;
+        context = db;
     }
 
     public async Task<Department> AddAsync(Department department, CancellationToken cancellationToken = default)
@@ -22,20 +22,20 @@ public class DepartmentService : IDepartmentService
         if (string.IsNullOrWhiteSpace(department.Name))
             throw new Exception("Department must have a name");
 
-        _context.Departments.Add(department);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Departments.Add(department);
+        await context.SaveChangesAsync(cancellationToken);
 
         return department;
     }
 
     public Task<List<Department>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return _context.Departments.ToListAsync(cancellationToken);
+        return context.Departments.ToListAsync(cancellationToken);
     }
 
     public Task<Department?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return _context.Departments.FirstOrDefaultAsync(department => department.Id == id, cancellationToken);
+        return context.Departments.FirstOrDefaultAsync(department => department.Id == id, cancellationToken);
     }
 
     public async Task<bool> DeleteAsync(Department department, CancellationToken cancellationToken = default)
@@ -43,8 +43,8 @@ public class DepartmentService : IDepartmentService
         bool result = false;
         try
         {
-            _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
+            context.Departments.Remove(department);
+            await context.SaveChangesAsync();
             result = true;
         }
         catch

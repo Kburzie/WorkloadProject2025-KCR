@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkloadProject2025.Migrations
 {
     /// <inheritdoc />
-    public partial class Fixedtheschoolrelation : Migration
+    public partial class WorkloadType : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,20 +51,6 @@ namespace WorkloadProject2025.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Courses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Hours = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Courses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Faculty",
                 columns: table => new
                 {
@@ -76,19 +62,6 @@ namespace WorkloadProject2025.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Faculty", x => x.Email);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProgramsOfStudy",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProgramsOfStudy", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,7 +83,7 @@ namespace WorkloadProject2025.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IntakeName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -125,7 +98,7 @@ namespace WorkloadProject2025.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MiniumHours = table.Column<int>(type: "int", nullable: false),
+                    MinimumHours = table.Column<int>(type: "int", nullable: false),
                     MaximumHours = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -133,6 +106,19 @@ namespace WorkloadProject2025.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkloadCategories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkloadTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkloadTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -261,6 +247,47 @@ namespace WorkloadProject2025.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProgramsOfStudy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProgramsOfStudy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProgramsOfStudy_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Courses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Hours = table.Column<int>(type: "int", nullable: false),
+                    ProgramOfStudyId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Courses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Courses_ProgramsOfStudy_ProgramOfStudyId",
+                        column: x => x.ProgramOfStudyId,
+                        principalTable: "ProgramsOfStudy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -301,9 +328,19 @@ namespace WorkloadProject2025.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Courses_ProgramOfStudyId",
+                table: "Courses",
+                column: "ProgramOfStudyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Departments_SchoolId",
                 table: "Departments",
                 column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProgramsOfStudy_DepartmentId",
+                table: "ProgramsOfStudy",
+                column: "DepartmentId");
         }
 
         /// <inheritdoc />
@@ -328,13 +365,7 @@ namespace WorkloadProject2025.Migrations
                 name: "Courses");
 
             migrationBuilder.DropTable(
-                name: "Departments");
-
-            migrationBuilder.DropTable(
                 name: "Faculty");
-
-            migrationBuilder.DropTable(
-                name: "ProgramsOfStudy");
 
             migrationBuilder.DropTable(
                 name: "Terms");
@@ -343,10 +374,19 @@ namespace WorkloadProject2025.Migrations
                 name: "WorkloadCategories");
 
             migrationBuilder.DropTable(
+                name: "WorkloadTypes");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ProgramsOfStudy");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Schools");

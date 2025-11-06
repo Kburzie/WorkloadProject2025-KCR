@@ -1,0 +1,45 @@
+﻿@inject WorkloadTypeService workloadTypeService
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="workloadType" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <MudStack Spacing="2">
+                <MudTextField For="@(() => workloadType.Name)"
+                              @bind-Value="workloadType.Name"
+                              Label="Workload Type Name"
+                              Required="true"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.FactCheck" />
+            </MudStack>
+            <MudCardActions Class="d-flex justify-end mt-4">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                <MudStaticButton Variant="Variant.Text" Color="Color.Secondary" FormAction="FormAction.Submit">Save</MudStaticButton>
+            </MudCardActions>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
+
+    private WorkloadType workloadType { get; set; } = new WorkloadType();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        await workloadTypeService.AddAsync(workloadType);
+        await OnSaved.InvokeAsync();
+        workloadType = new WorkloadType();
+        MudDialog.Close(DialogResult.Ok(true));
+        StateHasChanged();
+    }
+}
