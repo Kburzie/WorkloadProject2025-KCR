@@ -20,6 +20,10 @@ public class Workload
 
     public double Hours { get; set; }
 
+    //Not required in the case of the workload not being tied to any specific program (Ex. chair
+    public int? ProgramOfStudyID { get; set; }
+    public ProgramOfStudy Program { get; set; }
+
     //Not required in the case of the workload not being coursework (Ex. coordinator or research)
     public int? CourseId { get; set; }
     public Course Course { get; set; }
