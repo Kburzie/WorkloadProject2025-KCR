@@ -38,6 +38,9 @@
 </MudCard>
 
 @code {
+    [CascadingParameter]
+    MudBlazor.IDialogReference? MudDialog { get; set; }
+
     [Parameter]
     public EventCallback<Department> OnSaved { get; set; }
 
@@ -51,12 +54,14 @@
     private void Cancel()
     {
         department = new Department(); // reset form
+        MudDialog?.Close(DialogResult.Cancel());
     }
 
     private async void Save()
     {
         await DepartmentService.AddAsync(department);
         await OnSaved.InvokeAsync();
-        Cancel();
+        department = new Department(); // reset form
+        MudDialog?.Close(DialogResult.Ok(true));
     }
 }

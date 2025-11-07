@@ -4,13 +4,12 @@
 @inject ProgramsOfStudyService _ProgramOfStudyService;
 @inject DepartmentService _departmentService;
 @inject IDialogService DialogService
-<ProgramOfStudyForm department="DEPT" OnSaved="Save"></ProgramOfStudyForm>
 
 <MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
         <MudText Typo="Typo.h5" Class="font-semibold">Current Programs</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Program</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;" OnClick="OpenAddProgramDialog">Add New Program</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
@@ -47,6 +46,22 @@
         POS = await _ProgramOfStudyService.GetAllAsync();
         DEPT = await _departmentService.GetAllAsync();
         //Let the GUI know state changed
+    }
+
+    private async Task OpenAddProgramDialog()
+    {
+        var parameters = new DialogParameters<ProgramOfStudyForm>
+        {
+            { x => x.department, DEPT }
+        };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<ProgramOfStudyForm>("Add New Program", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Save();
+        }
     }
 
     public async Task Save()

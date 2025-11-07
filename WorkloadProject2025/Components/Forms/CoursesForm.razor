@@ -44,6 +44,9 @@
 </MudCard>
 
 @code {
+    [CascadingParameter]
+    MudBlazor.IDialogReference? MudDialog { get; set; }
+
     private Course course { get; set; } = new Course();
 
     [Parameter]
@@ -55,12 +58,14 @@
     private void Cancel()
     {
         course = new Course(); // reset form
+        MudDialog?.Close(DialogResult.Cancel());
     }
 
     private async Task Save()
     {
         await courseService.AddAsync(course);
         await OnCourseSaved.InvokeAsync();
-        Cancel();
+        course = new Course(); // reset form
+        MudDialog?.Close(DialogResult.Ok(true));
     }
 }

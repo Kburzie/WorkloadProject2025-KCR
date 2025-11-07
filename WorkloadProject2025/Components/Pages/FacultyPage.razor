@@ -4,13 +4,11 @@
 @inject FacultyService _facultyService
 @inject IDialogService DialogService
 
-<FacultyForm OnSaved="Save"></FacultyForm>
-
 <MudCard Class="mx-auto mt-6" Style="max-width: 850px;">
     <MudCardHeader>
         <MudText Typo="Typo.h5" Class="font-semibold">Current Faculty</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;">Add New Faculty</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: uppercase;" OnClick="OpenAddFacultyDialog">Add New Faculty</MudButton>
     </MudCardHeader>
 
     <MudCardContent>
@@ -44,6 +42,18 @@
     protected override async Task OnInitializedAsync()
     {
         faculty = await _facultyService.GetAllAsync();
+    }
+
+    private async Task OpenAddFacultyDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<FacultyForm>("Add New Faculty", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await Save();
+        }
     }
 
     public async Task Save()
