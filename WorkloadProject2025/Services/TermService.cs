@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WorkloadProject2025.Data;
 using WorkloadProject2025.Data.Models;
+using WorkloadProject2025.Migrations;
 using WorkloadProject2025.Services.Interfaces;
 
 namespace WorkloadProject2025.Services;
@@ -18,6 +19,10 @@ public class TermService : ITermService
     {
         if (intake == null)
             throw new ArgumentNullException();
+        if (intake.Name.Trim() == "")
+        {
+            throw new Exception("Workload type must have a name");
+        }
 
         if (string.IsNullOrWhiteSpace(intake.Name))
             throw new ArgumentException("Intake must have a name", nameof(intake));
